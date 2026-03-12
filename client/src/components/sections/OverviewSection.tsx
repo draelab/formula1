@@ -1,10 +1,9 @@
 // F1 2026 Dashboard — Overview Section (Live Data)
-// Design: Hero banner + key stats + latest race result
+// Design: Hero banner + compact stats bar + race result with bar chart
 
 import { DRIVERS_2026, CONSTRUCTORS_2026, RACES_2026, TEAM_COLORS } from "@/lib/f1Data";
 import { useDriverStandings, useConstructorStandings, useRaceResults, useSchedule } from "@/hooks/useF1LiveData";
-import { Trophy, Zap, Flag, Clock, TrendingUp, ChevronRight } from "lucide-react";
-import { DataFreshnessBadge } from "@/components/LiveDataUI";
+import { Zap, ChevronRight } from "lucide-react";
 
 const HERO_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310419663031769921/QfooNsf5N2WhwQZYmGVtwY/f1-hero-banner-4qb4fdVTV5aszZb5q6bpPq.webp";
 const COCKPIT_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310419663031769921/QfooNsf5N2WhwQZYmGVtwY/f1-cockpit-view-RT5qP3fSrxVZwiVuYSEQxm.webp";
@@ -14,17 +13,17 @@ interface OverviewSectionProps {
 }
 
 export default function OverviewSection({ onSectionChange }: OverviewSectionProps) {
-  const { standings: driverStandings, isLive: driversLive, isLoading: driversLoading, updatedAt } = useDriverStandings();
+  const { standings: driverStandings, isLoading: driversLoading } = useDriverStandings();
   const { standings: constructorStandings } = useConstructorStandings();
-  const { races: liveRaceResults, isLive: resultsLive } = useRaceResults();
+  const { races: liveRaceResults } = useRaceResults();
   const { races: liveSchedule } = useSchedule();
 
-  // Use live data if available, otherwise fall back to static
   const leader = driverStandings[0] ?? DRIVERS_2026[0];
   const constructorLeader = constructorStandings[0] ?? CONSTRUCTORS_2026[0];
+  const top5Drivers = (driverStandings.length > 0 ? driverStandings : DRIVERS_2026).slice(0, 5);
 
-  // Determine last completed race and next race
   const today = new Date();
+  const completedCount = liveRaceResults.length || RACES_2026.filter(r => r.status === "completed").length;
   const lastRace = liveRaceResults.length > 0
     ? liveRaceResults[liveRaceResults.length - 1]
     : RACES_2026.find(r => r.status === "completed");
@@ -33,13 +32,26 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
     ? liveSchedule.find((r: any) => new Date(r.date) >= today)
     : RACES_2026.find(r => r.status === "next");
 
-  const leaderColor = (leader as any).teamColor || TEAM_COLORS[(leader as any).team] || "#E8002D";
-  const constructorColor = (constructorLeader as any).teamColor || TEAM_COLORS[(constructorLeader as any).name] || "#E8002D";
+  // Top 5 results from last race
+  const raceTop5 = lastRace && (lastRace as any).results
+    ? (lastRace as any).results.slice(0, 5)
+    : [
+        { givenName: "George", familyName: "Russell", team: "Mercedes", points: 25 },
+        { givenName: "Kimi", familyName: "Antonelli", team: "Mercedes", points: 18 },
+        { givenName: "Charles", familyName: "Leclerc", team: "Ferrari", points: 15 },
+        { givenName: "Lewis", familyName: "Hamilton", team: "Ferrari", points: 12 },
+        { givenName: "Lando", familyName: "Norris", team: "McLaren", points: 10 },
+      ];
 
-  // Get top 3 from last race
-  const top3 = lastRace && (lastRace as any).results
-    ? (lastRace as any).results.slice(0, 3)
-    : null;
+  const maxPoints = Math.max(...top5Drivers.map((d: any) => Number(d.points) || 0));
+
+  // Helper to get 3-letter code from name
+  const getCode = (d: any) => {
+    const name = d.familyName || d.name?.split(" ").pop() || "";
+    return name.substring(0, 3).toUpperCase();
+  };
+
+  const getFlag = (d: any) => d.flag || d.nationality?.substring(0, 2) || "🏁";
 
   return (
     <div className="space-y-0">
@@ -72,193 +84,206 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
             >
               RACE CALENDAR
             </button>
-            <DataFreshnessBadge isLive={driversLive} updatedAt={updatedAt} isLoading={driversLoading} />
           </div>
         </div>
       </div>
 
-      {/* Championship Leaders */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-        {/* Driver Leader */}
-        <div className="bg-[#1A1A2E] p-6 md:p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10" style={{ background: leaderColor, filter: "blur(40px)" }} />
-          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-3">Drivers Championship Leader</div>
-          <div className="flex items-end gap-4">
-            <div>
-              <div className="text-white/60 text-sm mb-1">{(leader as any).flag} {(leader as any).nationality}</div>
-              <div className="f1-display text-white text-3xl md:text-4xl font-black leading-none mb-1">
-                {(leader as any).name || `${(leader as any).givenName} ${(leader as any).familyName}`}
-              </div>
-              <div className="text-sm font-medium" style={{ color: leaderColor }}>{(leader as any).team}</div>
-            </div>
-            <div className="ml-auto text-right">
-              <div className="f1-stat-number text-5xl font-black" style={{ color: leaderColor }}>{(leader as any).points}</div>
-              <div className="text-white/40 text-xs f1-mono">POINTS</div>
-            </div>
+      {/* Compact Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 bg-[#1A1A2E] border-b border-white/10">
+        <div className="p-4 md:p-5 border-r border-white/10 text-center">
+          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Championship Leader</div>
+          <div className="text-white font-bold text-sm f1-display">
+            {(leader as any).name || `${(leader as any).givenName} ${(leader as any).familyName}`}
           </div>
-          <div className="mt-4 h-0.5 w-full opacity-20" style={{ background: leaderColor }} />
-          <div className="mt-3 flex gap-4">
-            {[
-              { label: "Wins", value: (leader as any).wins ?? 0 },
-              { label: "Podiums", value: (leader as any).podiums ?? "—" },
-              { label: "Poles", value: (leader as any).poles ?? "—" },
-            ].map(({ label, value }) => (
-              <div key={label}>
-                <div className="text-white/40 text-xs f1-mono">{label}</div>
-                <div className="text-white font-bold f1-stat-number">{value}</div>
-              </div>
-            ))}
+          <div className="text-[#E8002D] text-sm f1-mono font-bold">{(leader as any).points} PTS</div>
+        </div>
+        <div className="p-4 md:p-5 border-r border-white/10 text-center">
+          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Constructors Leader</div>
+          <div className="text-white font-bold text-sm f1-display">{(constructorLeader as any).name}</div>
+          <div className="text-[#E8002D] text-sm f1-mono font-bold">{(constructorLeader as any).points} PTS</div>
+        </div>
+        <div className="p-4 md:p-5 border-r border-white/10 text-center">
+          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Races Completed</div>
+          <div className="text-white font-bold text-lg f1-display">{completedCount} / 24</div>
+          <div className="text-white/50 text-xs f1-mono">
+            {lastRace ? ((lastRace as any).raceName || (lastRace as any).name || "").replace(" Grand Prix", "") : "—"}
           </div>
         </div>
-
-        {/* Constructor Leader */}
-        <div className="p-6 md:p-8 relative overflow-hidden" style={{ backgroundColor: constructorColor }}>
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="relative">
-            <div className="text-white/60 text-xs f1-mono uppercase tracking-widest mb-3">Constructors Championship Leader</div>
-            <div className="f1-display text-white text-3xl md:text-4xl font-black leading-none mb-1">
-              {(constructorLeader as any).name}
-            </div>
-            <div className="text-white/70 text-sm mb-4">
-              {(constructorLeader as any).chassis ?? "—"} · {(constructorLeader as any).powerUnit ?? "—"}
-            </div>
-            <div className="flex items-end gap-4">
-              <div>
-                <div className="text-white/60 text-xs f1-mono">Drivers</div>
-                <div className="text-white text-sm font-medium">
-                  {((constructorLeader as any).drivers ?? []).join(" · ")}
-                </div>
-              </div>
-              <div className="ml-auto text-right">
-                <div className="f1-stat-number text-5xl font-black text-white">{(constructorLeader as any).points}</div>
-                <div className="text-white/60 text-xs f1-mono">POINTS</div>
-              </div>
-            </div>
+        <div className="p-4 md:p-5 text-center">
+          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Next Race</div>
+          <div className="text-white font-bold text-sm f1-display">
+            {nextRace ? ((nextRace as any).country || ((nextRace as any).raceName || (nextRace as any).name || "").replace(" Grand Prix", "")) : "—"}
+          </div>
+          <div className="text-[#E8002D] text-xs f1-mono">
+            {nextRace ? (nextRace as any).date : ""}
           </div>
         </div>
       </div>
 
-      {/* Season Stats Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 bg-white border-b border-gray-100">
-        {[
-          { icon: <Flag size={16} />, label: "Races Completed", value: liveRaceResults.length || RACES_2026.filter(r => r.status === "completed").length },
-          { icon: <Clock size={16} />, label: "Races Remaining", value: 24 - (liveRaceResults.length || RACES_2026.filter(r => r.status === "completed").length) },
-          { icon: <Trophy size={16} />, label: "Different Winners", value: 1 },
-          { icon: <TrendingUp size={16} />, label: "Season Round", value: `${liveRaceResults.length || 1} / 24` },
-        ].map(({ icon, label, value }) => (
-          <div key={label} className="p-4 md:p-5 border-r border-gray-100 last:border-r-0 flex items-center gap-3">
-            <div className="text-[#E8002D]">{icon}</div>
-            <div>
-              <div className="text-xs text-gray-400 f1-mono uppercase">{label}</div>
-              <div className="font-black text-xl text-[#1A1A2E] f1-stat-number">{value}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Main Content: Latest Race + Sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+        {/* Left: Latest Race */}
+        <div className="lg:col-span-2 bg-white p-6 md:p-8 border-r border-gray-100">
+          <h2 className="f1-display text-xl font-black text-[#1A1A2E] uppercase mb-4 flex items-center gap-2">
+            <span className="w-1 h-6 bg-[#E8002D] inline-block" />
+            Latest Race — {lastRace ? ((lastRace as any).raceName || (lastRace as any).name || "").replace(" Grand Prix", "") : "Australia"}
+          </h2>
 
-      {/* Latest Race Result */}
-      {lastRace && (
-        <div className="p-6 md:p-8 bg-white">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <div className="text-[#E8002D] text-xs f1-mono uppercase tracking-widest mb-1">Latest Result</div>
-              <h3 className="f1-display text-xl font-black text-[#1A1A2E] uppercase">
-                {(lastRace as any).raceName || (lastRace as any).name}
-              </h3>
-              <div className="text-gray-400 text-xs f1-mono mt-0.5">
-                {(lastRace as any).date} · {(lastRace as any).circuitName || (lastRace as any).circuit}
+          {/* Race Image */}
+          <div className="relative h-48 md:h-64 overflow-hidden mb-6">
+            <img
+              src={COCKPIT_IMG}
+              alt="Race"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute bottom-0 left-0 p-4 md:p-6">
+              <div className="text-white/60 text-xs f1-mono mb-1">
+                ROUND {(lastRace as any)?.round || 1} · {((lastRace as any)?.circuitName || (lastRace as any)?.circuit || "Albert Park").toUpperCase()} · {(lastRace as any)?.date || "8 MARCH 2026"}
+              </div>
+              <div className="f1-display text-white text-xl md:text-2xl font-black uppercase">
+                {(lastRace as any)?.raceName || (lastRace as any)?.name || "Australian Grand Prix"}
               </div>
             </div>
-            {resultsLive && (
-              <span className="text-xs f1-mono text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded-sm">
-                LIVE DATA
-              </span>
-            )}
           </div>
 
-          {/* Top 3 from live results */}
-          {top3 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {top3.map((result: any, idx: number) => {
-                const medals = ["🥇", "🥈", "🥉"];
-                const bgColors = ["bg-yellow-50 border-yellow-200", "bg-gray-50 border-gray-200", "bg-amber-50 border-amber-200"];
-                return (
-                  <div key={idx} className={`rounded-sm border p-3 ${bgColors[idx]}`}>
-                    <div className="text-lg mb-1">{medals[idx]}</div>
+          {/* Top 5 Results */}
+          <div className="space-y-0">
+            {raceTop5.map((result: any, idx: number) => {
+              const teamColor = TEAM_COLORS[result.team] || "#666";
+              const posColors = ["bg-[#E8002D] text-white", "bg-[#1A1A2E] text-white", "bg-[#1A1A2E] text-white", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent"];
+              return (
+                <div key={idx} className="flex items-center py-3 border-b border-gray-100 last:border-b-0">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-4 ${posColors[idx]}`}
+                    style={idx < 3 ? {} : {}}
+                  >
+                    {idx + 1}
+                  </div>
+                  <div className="w-1 h-8 mr-3 rounded-full" style={{ backgroundColor: teamColor }} />
+                  <div className="flex-1">
                     <div className="font-bold text-sm text-[#1A1A2E]">
-                      {result.givenName} {result.familyName}
+                      {result.givenName ? `${result.givenName} ${result.familyName}` : result.name}
                     </div>
-                    <div className="text-xs text-gray-500">{result.team}</div>
-                    <div className="text-xs f1-mono text-gray-400 mt-1">{result.points} pts</div>
+                    <div className="text-xs text-gray-400">{result.team}</div>
+                  </div>
+                  <div className="text-sm f1-mono font-semibold text-[#1A1A2E]">{result.points} pts</div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Race Footer */}
+          <div className="mt-4 flex items-center justify-between text-xs text-gray-400 f1-mono">
+            <div>Pole: G. Russell · Fastest Lap: M. Verstappen</div>
+            <div>Laps: 58</div>
+          </div>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="bg-[#1A1A2E]">
+          {/* Top 5 Drivers Bar Chart */}
+          <div className="p-6 border-b border-white/10">
+            <h3 className="f1-display text-white text-lg font-black uppercase mb-4">Top 5 Drivers</h3>
+            <div className="space-y-3">
+              {top5Drivers.map((d: any, idx: number) => {
+                const teamColor = d.teamColor || TEAM_COLORS[d.team] || "#E8002D";
+                const pts = Number(d.points) || 0;
+                const barWidth = maxPoints > 0 ? (pts / maxPoints) * 100 : 0;
+                return (
+                  <div key={idx}>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-white/50 text-xs f1-mono w-4">{idx + 1}</span>
+                        <span className="text-white font-bold text-sm f1-mono">{getCode(d)}</span>
+                        <span className="text-sm">{getFlag(d)}</span>
+                      </div>
+                      <span className="text-white font-bold text-sm f1-mono">{pts}</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${barWidth}%`, backgroundColor: teamColor }}
+                      />
+                    </div>
                   </div>
                 );
               })}
             </div>
-          ) : (
-            /* Fallback static display */
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {[
-                { pos: "🥇 P1", name: "George Russell", team: "Mercedes", detail: "Led from pole" },
-                { pos: "🥈 P2", name: "Kimi Antonelli", team: "Mercedes", detail: "Mercedes 1-2" },
-                { pos: "🥉 P3", name: "Charles Leclerc", team: "Ferrari", detail: "Best of the rest" },
-              ].map(({ pos, name, team, detail }) => (
-                <div key={pos} className="bg-gray-50 rounded-sm border border-gray-100 p-3">
-                  <div className="text-xs text-gray-400 f1-mono mb-1">{pos}</div>
-                  <div className="font-bold text-sm text-[#1A1A2E]">{name}</div>
-                  <div className="text-xs text-gray-500">{team}</div>
-                  <div className="text-xs text-gray-400 mt-1">{detail}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+          </div>
 
-      {/* Next Race */}
-      {nextRace && (
-        <div className="bg-[#1A1A2E] p-6 md:p-8">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-[#E8002D] text-xs f1-mono uppercase tracking-widest mb-2">Next Race</div>
-              <h3 className="f1-display text-white text-2xl font-black uppercase mb-1">
-                {(nextRace as any).raceName || (nextRace as any).name}
-              </h3>
-              <div className="text-white/50 text-sm f1-mono">
-                {(nextRace as any).date} · {(nextRace as any).circuitName || (nextRace as any).circuit}
+          {/* Next Race Card */}
+          {nextRace && (
+            <div className="p-6 border-b border-white/10">
+              <h3 className="f1-display text-white text-lg font-black uppercase mb-3">Next Race</h3>
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <div className="text-white/40 text-xs f1-mono mb-1">ROUND {(nextRace as any).round || 2}</div>
+                  <div className="f1-display text-white text-lg font-black leading-tight">
+                    {(nextRace as any).raceName || (nextRace as any).name}
+                  </div>
+                  <div className="text-white/50 text-xs f1-mono mt-1">
+                    {(nextRace as any).circuitName || (nextRace as any).circuit}
+                  </div>
+                </div>
+                {(nextRace as any).flag && (
+                  <span className="text-2xl">{(nextRace as any).flag}</span>
+                )}
               </div>
+
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div>
+                  <div className="text-white/40 text-xs f1-mono">Date</div>
+                  <div className="text-white text-sm font-medium">{(nextRace as any).date}</div>
+                </div>
+                <div>
+                  <div className="text-white/40 text-xs f1-mono">Format</div>
+                  <div className="text-white text-sm font-medium">
+                    {(nextRace as any).sprint ? "Sprint Weekend" : "Standard"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-white/40 text-xs f1-mono">Circuit Length</div>
+                  <div className="text-white text-sm font-medium">{(nextRace as any).circuitLength || "5.451 km"}</div>
+                </div>
+                <div>
+                  <div className="text-white/40 text-xs f1-mono">Favourite</div>
+                  <div className="text-sm font-medium" style={{ color: "#E8002D" }}>
+                    {(leader as any).name || `${(leader as any).givenName} ${(leader as any).familyName}`}
+                  </div>
+                </div>
+              </div>
+
               {(nextRace as any).sprint && (
-                <div className="mt-2 inline-flex items-center gap-1 bg-[#E8002D]/20 text-[#E8002D] text-xs f1-mono px-2 py-0.5 rounded-sm">
+                <div className="mt-3 w-full bg-[#E8002D]/20 text-[#E8002D] text-xs f1-mono px-3 py-2 rounded-sm flex items-center gap-1 justify-center">
                   <Zap size={10} />
                   SPRINT WEEKEND
                 </div>
               )}
             </div>
-            <button
-              onClick={() => onSectionChange("races")}
-              className="text-white/40 hover:text-white text-xs f1-mono flex items-center gap-1 transition-colors mt-1"
-            >
-              VIEW CALENDAR <ChevronRight size={12} />
-            </button>
+          )}
+
+          {/* 2026 Key Changes */}
+          <div className="p-6">
+            <h3 className="f1-display text-white text-lg font-black uppercase mb-3">2026 Key Changes</h3>
+            <div className="space-y-2">
+              {[
+                { icon: "⚡", text: "350kW MGU-K — 3× more electric power" },
+                { icon: "🌬️", text: "Active aerodynamics replace DRS" },
+                { icon: "🏎️", text: "Audi & Cadillac debut as new teams" },
+              ].map(({ icon, text }) => (
+                <div key={text} className="flex items-center gap-2 text-white/70 text-sm">
+                  <span>{icon}</span>
+                  <span>{text}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* 2026 Regulation Changes Banner */}
-      <div className="p-6 md:p-8 bg-gray-50 border-t border-gray-100">
-        <div className="text-[#E8002D] text-xs f1-mono uppercase tracking-widest mb-3">2026 Regulation Changes</div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { title: "New Power Unit", desc: "50/50 ICE/ERS split, 350kW electrical deployment" },
-            { title: "Active Aerodynamics", desc: "Moveable front & rear wings for drag reduction" },
-            { title: "Narrower Cars", desc: "Width reduced from 2000mm to 1900mm" },
-            { title: "New Teams", desc: "Audi F1 and Cadillac join the grid as new entrants" },
-          ].map(({ title, desc }) => (
-            <div key={title} className="bg-white rounded-sm border border-gray-100 p-3">
-              <div className="font-semibold text-sm text-[#1A1A2E] mb-1">{title}</div>
-              <div className="text-xs text-gray-500 leading-relaxed">{desc}</div>
-            </div>
-          ))}
-        </div>
+      {/* Footer */}
+      <div className="bg-gray-50 px-6 py-3 text-xs text-gray-400 f1-mono flex items-center justify-between border-t border-gray-100">
+        <div>Data current as of<br />Round {completedCount} — {lastRace ? ((lastRace as any).raceName || (lastRace as any).name || "Australia") : "Australia"} {new Date().getFullYear()}</div>
       </div>
     </div>
   );
