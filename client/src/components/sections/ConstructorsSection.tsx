@@ -9,8 +9,12 @@ import { DataFreshnessBadge, ConstructorSkeleton } from "@/components/LiveDataUI
 
 const PIT_STOP_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310419663031769921/QfooNsf5N2WhwQZYmGVtwY/f1-pit-stop-Jz4yxLDRhPimQfbVkZphv8.webp";
 
-export default function ConstructorsSection() {
-  const [selected, setSelected] = useState<string | null>(null);
+interface ConstructorsSectionProps {
+  initialTeam?: string;
+}
+
+export default function ConstructorsSection({ initialTeam }: ConstructorsSectionProps) {
+  const [selected, setSelected] = useState<string | null>(initialTeam || null);
   const { standings: liveStandings, round, isLive, isLoading, updatedAt } = useConstructorStandings();
 
   // Use live data if available, otherwise fall back to static

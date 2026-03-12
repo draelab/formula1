@@ -5,13 +5,22 @@ import { useState } from "react";
 import { TEAM_COLORS } from "@/lib/f1Data";
 import { useDriverStandings } from "@/hooks/useF1LiveData";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { ChevronDown, ChevronUp, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { DataFreshnessBadge, DriverSkeleton } from "@/components/LiveDataUI";
+import DriverProfileModal from "@/components/DriverProfileModal";
 
-export default function DriversSection() {
-  const [expanded, setExpanded] = useState<string | null>(null);
+interface DriversSectionProps {
+  onNavigateToTeam?: (team: string) => void;
+  onNavigateToCar?: (team: string) => void;
+}
+
+export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: DriversSectionProps) {
+  const [selectedDriver, setSelectedDriver] = useState<any>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [view, setView] = useState<"table" | "chart">("table");
   const { standings, round, isLive, isLoading, updatedAt } = useDriverStandings();
+
+  const maxPoints = Math.max(...standings.map((d: any) => d.points), 1);
 
   const chartData = standings.filter((d: any) => d.points > 0).map((d: any) => ({
     name: d.shortName,
@@ -19,6 +28,11 @@ export default function DriversSection() {
     team: d.team,
     color: (d.teamColor || TEAM_COLORS[d.team]) ?? "#888",
   }));
+
+  const handleDriverClick = (driver: any) => {
+    setSelectedDriver(driver);
+    setModalOpen(true);
+  };
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -89,14 +103,13 @@ export default function DriversSection() {
           {/* Driver rows */}
           {standings.map((driver: any) => {
             const teamColor = driver.teamColor || TEAM_COLORS[driver.team] || "#888";
-            const isExpanded = expanded === driver.name;
             const pos = driver.position;
 
             return (
               <div key={driver.name || driver.driverId} className="border-b border-gray-50 last:border-0">
                 <div
                   className="grid grid-cols-[40px_40px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-3 items-center cursor-pointer hover:bg-gray-50/50 transition-colors"
-                  onClick={() => setExpanded(isExpanded ? null : driver.name)}
+                  onClick={() => handleDriverClick(driver)}
                 >
                   {/* Position */}
                   <div className={`w-8 h-8 flex items-center justify-center text-sm font-black f1-display rounded-sm ${pos === 1 ? "bg-yellow-400 text-[#1A1A2E]" : pos === 2 ? "bg-gray-300 text-[#1A1A2E]" : pos === 3 ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-500"}`}>
@@ -135,7 +148,7 @@ export default function DriversSection() {
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden w-16">
                         <div
                           className="h-full rounded-full"
-                          style={{ width: `${(driver.points / 25) * 100}%`, backgroundColor: teamColor }}
+                          style={{ width: `${(driver.points / maxPoints) * 100}%`, backgroundColor: teamColor }}
                         />
                       </div>
                     )}
@@ -147,31 +160,11 @@ export default function DriversSection() {
                     <span className="text-xs text-gray-400 ml-1">pts</span>
                   </div>
 
-                  {/* Expand */}
+                  {/* Arrow */}
                   <div className="flex justify-end">
-                    {isExpanded ? <ChevronUp size={12} className="text-gray-400" /> : <ChevronDown size={12} className="text-gray-300" />}
+                    <ChevronRight size={12} className="text-gray-300" />
                   </div>
                 </div>
-
-                {/* Expanded driver bio */}
-                {isExpanded && (
-                  <div className="px-4 pb-4 pt-2 bg-gray-50/30 border-t border-gray-100">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-                      {[
-                        { label: "Points", value: driver.points },
-                        { label: "Wins", value: driver.wins ?? 0 },
-                        { label: "Podiums", value: driver.podiums ?? "—" },
-                        { label: "Poles", value: driver.poles ?? "—" },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="bg-white rounded-sm p-2 border border-gray-100 text-center">
-                          <div className="text-xs text-gray-400 f1-mono">{label}</div>
-                          <div className="font-black f1-stat-number text-lg text-[#1A1A2E]">{value}</div>
-                        </div>
-                      ))}
-                    </div>
-                    {driver.bio && <p className="text-xs text-gray-500 leading-relaxed">{driver.bio}</p>}
-                  </div>
-                )}
               </div>
             );
           })}
@@ -196,6 +189,15 @@ export default function DriversSection() {
           </ResponsiveContainer>
         </div>
       )}
+
+      {/* Driver Profile Modal */}
+      <DriverProfileModal
+        driver={selectedDriver}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onNavigateToTeam={onNavigateToTeam}
+        onNavigateToCar={onNavigateToCar}
+      />
     </div>
   );
 }

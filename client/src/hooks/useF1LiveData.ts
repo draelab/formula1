@@ -73,7 +73,8 @@ export function useDriverStandings() {
       const teamColor = CONSTRUCTOR_ID_TO_COLOR[d.constructorId ?? ""] ?? "#888";
       const teamDisplay = CONSTRUCTOR_ID_TO_DISPLAY[d.constructorId ?? ""] ?? d.team;
       return {
-        ...d,
+        ...staticDriver, // spread static profile fields first (career, bio, photo, etc.)
+        ...d, // then overlay live API data (position, points, wins)
         flag: staticDriver?.flag ?? NATIONALITY_FLAGS[d.nationality ?? ""] ?? "🏁",
         number: d.number ?? staticDriver?.number ?? "—",
         team: teamDisplay,

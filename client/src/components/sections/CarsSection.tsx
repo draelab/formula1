@@ -33,8 +33,12 @@ const getRadarData = (team: string) => {
   ];
 };
 
-export default function CarsSection() {
-  const [selected, setSelected] = useState<string>("Mercedes");
+interface CarsSectionProps {
+  initialTeam?: string;
+}
+
+export default function CarsSection({ initialTeam }: CarsSectionProps) {
+  const [selected, setSelected] = useState<string>(initialTeam || "Mercedes");
   const [expandedSpec, setExpandedSpec] = useState<string | null>(null);
 
   const car = CAR_SPECS_2026.find(c => c.team === selected)!;
