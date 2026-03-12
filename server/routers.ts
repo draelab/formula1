@@ -9,6 +9,20 @@ const JOLPICA_BASE = "https://api.jolpi.ca/ergast/f1";
 const OPENF1_BASE = "https://api.openf1.org/v1";
 const CURRENT_YEAR = 2026;
 
+// In-memory cache: stores last successful API response per endpoint key
+const apiCache = new Map<string, { data: any; cachedAt: string }>();
+
+function cacheSet(key: string, data: any) {
+  apiCache.set(key, { data, cachedAt: new Date().toISOString() });
+}
+
+function cacheGet(key: string) {
+  const entry = apiCache.get(key);
+  if (!entry) return null;
+  // Mark the data as served from cache
+  return { ...entry.data, updatedAt: entry.cachedAt, fromCache: true };
+}
+
 async function fetchJolpica(path: string) {
   const url = `${JOLPICA_BASE}${path}`;
   const res = await fetch(url, {
@@ -33,10 +47,11 @@ async function fetchOpenF1(path: string) {
 const f1Router = router({
   /** Driver championship standings for the current season */
   driverStandings: publicProcedure.query(async () => {
+    const CACHE_KEY = "driverStandings";
     try {
       const data = await fetchJolpica(`/${CURRENT_YEAR}/driverstandings.json?limit=30`);
       const standingsList = data?.MRData?.StandingsTable?.StandingsLists?.[0];
-      return {
+      const result = {
         season: standingsList?.season ?? String(CURRENT_YEAR),
         round: standingsList?.round ?? "0",
         standings: (standingsList?.DriverStandings ?? []).map((d: any) => ({
@@ -54,18 +69,21 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
+      cacheSet(CACHE_KEY, result);
+      return result;
     } catch (err) {
       console.error("[F1 API] driverStandings error:", err);
-      return null;
+      return cacheGet(CACHE_KEY);
     }
   }),
 
   /** Constructor championship standings for the current season */
   constructorStandings: publicProcedure.query(async () => {
+    const CACHE_KEY = "constructorStandings";
     try {
       const data = await fetchJolpica(`/${CURRENT_YEAR}/constructorstandings.json?limit=15`);
       const standingsList = data?.MRData?.StandingsTable?.StandingsLists?.[0];
-      return {
+      const result = {
         season: standingsList?.season ?? String(CURRENT_YEAR),
         round: standingsList?.round ?? "0",
         standings: (standingsList?.ConstructorStandings ?? []).map((c: any) => ({
@@ -79,18 +97,21 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
+      cacheSet(CACHE_KEY, result);
+      return result;
     } catch (err) {
       console.error("[F1 API] constructorStandings error:", err);
-      return null;
+      return cacheGet(CACHE_KEY);
     }
   }),
 
   /** All race results for the current season */
   raceResults: publicProcedure.query(async () => {
+    const CACHE_KEY = "raceResults";
     try {
       const data = await fetchJolpica(`/${CURRENT_YEAR}/results.json?limit=500`);
       const races = data?.MRData?.RaceTable?.Races ?? [];
-      return {
+      const result = {
         season: String(CURRENT_YEAR),
         races: races.map((race: any) => ({
           round: parseInt(race.round),
@@ -119,18 +140,21 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
+      cacheSet(CACHE_KEY, result);
+      return result;
     } catch (err) {
       console.error("[F1 API] raceResults error:", err);
-      return null;
+      return cacheGet(CACHE_KEY);
     }
   }),
 
   /** Full race schedule for the current season */
   schedule: publicProcedure.query(async () => {
+    const CACHE_KEY = "schedule";
     try {
       const data = await fetchJolpica(`/${CURRENT_YEAR}.json?limit=30`);
       const races = data?.MRData?.RaceTable?.Races ?? [];
-      return {
+      const result = {
         season: String(CURRENT_YEAR),
         races: races.map((race: any) => ({
           round: parseInt(race.round),
@@ -145,22 +169,25 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
+      cacheSet(CACHE_KEY, result);
+      return result;
     } catch (err) {
       console.error("[F1 API] schedule error:", err);
-      return null;
+      return cacheGet(CACHE_KEY);
     }
   }),
 
   /** Latest session info from OpenF1 */
   latestSession: publicProcedure.query(async () => {
+    const CACHE_KEY = "latestSession";
     try {
       const sessions = await fetchOpenF1(`/sessions?year=${CURRENT_YEAR}&session_type=Race`);
-      if (!sessions || sessions.length === 0) return null;
+      if (!sessions || sessions.length === 0) return cacheGet(CACHE_KEY);
       const sorted = [...sessions].sort((a: any, b: any) =>
         new Date(b.date_start).getTime() - new Date(a.date_start).getTime()
       );
       const latest = sorted[0];
-      return {
+      const result = {
         sessionKey: latest.session_key,
         sessionName: latest.session_name,
         sessionType: latest.session_type,
@@ -171,9 +198,11 @@ const f1Router = router({
         year: latest.year,
         updatedAt: new Date().toISOString(),
       };
+      cacheSet(CACHE_KEY, result);
+      return result;
     } catch (err) {
       console.error("[F1 API] latestSession error:", err);
-      return null;
+      return cacheGet(CACHE_KEY);
     }
   }),
 
@@ -181,11 +210,12 @@ const f1Router = router({
   qualifying: publicProcedure
     .input(z.object({ round: z.number() }))
     .query(async ({ input }) => {
+      const CACHE_KEY = `qualifying_${input.round}`;
       try {
         const data = await fetchJolpica(`/${CURRENT_YEAR}/${input.round}/qualifying.json`);
         const race = data?.MRData?.RaceTable?.Races?.[0];
-        if (!race) return null;
-        return {
+        if (!race) return cacheGet(CACHE_KEY);
+        const result = {
           round: parseInt(race.round),
           raceName: race.raceName,
           results: (race.QualifyingResults ?? []).map((r: any) => ({
@@ -201,9 +231,11 @@ const f1Router = router({
           })),
           updatedAt: new Date().toISOString(),
         };
+        cacheSet(CACHE_KEY, result);
+        return result;
       } catch (err) {
         console.error("[F1 API] qualifying error:", err);
-        return null;
+        return cacheGet(CACHE_KEY);
       }
     }),
 });
