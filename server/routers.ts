@@ -2,26 +2,13 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { cacheSet, cacheGet } from "./db";
 import { z } from "zod";
 
 // ─── F1 API helpers ────────────────────────────────────────────────────────────
 const JOLPICA_BASE = "https://api.jolpi.ca/ergast/f1";
 const OPENF1_BASE = "https://api.openf1.org/v1";
 const CURRENT_YEAR = 2026;
-
-// In-memory cache: stores last successful API response per endpoint key
-const apiCache = new Map<string, { data: any; cachedAt: string }>();
-
-function cacheSet(key: string, data: any) {
-  apiCache.set(key, { data, cachedAt: new Date().toISOString() });
-}
-
-function cacheGet(key: string) {
-  const entry = apiCache.get(key);
-  if (!entry) return null;
-  // Mark the data as served from cache
-  return { ...entry.data, updatedAt: entry.cachedAt, fromCache: true };
-}
 
 async function fetchJolpica(path: string) {
   const url = `${JOLPICA_BASE}${path}`;
@@ -69,11 +56,11 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
-      cacheSet(CACHE_KEY, result);
+      await cacheSet(CACHE_KEY, result);
       return result;
     } catch (err) {
       console.error("[F1 API] driverStandings error:", err);
-      return cacheGet(CACHE_KEY);
+      return await cacheGet(CACHE_KEY);
     }
   }),
 
@@ -97,11 +84,11 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
-      cacheSet(CACHE_KEY, result);
+      await cacheSet(CACHE_KEY, result);
       return result;
     } catch (err) {
       console.error("[F1 API] constructorStandings error:", err);
-      return cacheGet(CACHE_KEY);
+      return await cacheGet(CACHE_KEY);
     }
   }),
 
@@ -140,11 +127,11 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
-      cacheSet(CACHE_KEY, result);
+      await cacheSet(CACHE_KEY, result);
       return result;
     } catch (err) {
       console.error("[F1 API] raceResults error:", err);
-      return cacheGet(CACHE_KEY);
+      return await cacheGet(CACHE_KEY);
     }
   }),
 
@@ -169,11 +156,11 @@ const f1Router = router({
         })),
         updatedAt: new Date().toISOString(),
       };
-      cacheSet(CACHE_KEY, result);
+      await cacheSet(CACHE_KEY, result);
       return result;
     } catch (err) {
       console.error("[F1 API] schedule error:", err);
-      return cacheGet(CACHE_KEY);
+      return await cacheGet(CACHE_KEY);
     }
   }),
 
@@ -182,7 +169,7 @@ const f1Router = router({
     const CACHE_KEY = "latestSession";
     try {
       const sessions = await fetchOpenF1(`/sessions?year=${CURRENT_YEAR}&session_type=Race`);
-      if (!sessions || sessions.length === 0) return cacheGet(CACHE_KEY);
+      if (!sessions || sessions.length === 0) return await cacheGet(CACHE_KEY);
       const sorted = [...sessions].sort((a: any, b: any) =>
         new Date(b.date_start).getTime() - new Date(a.date_start).getTime()
       );
@@ -198,11 +185,11 @@ const f1Router = router({
         year: latest.year,
         updatedAt: new Date().toISOString(),
       };
-      cacheSet(CACHE_KEY, result);
+      await cacheSet(CACHE_KEY, result);
       return result;
     } catch (err) {
       console.error("[F1 API] latestSession error:", err);
-      return cacheGet(CACHE_KEY);
+      return await cacheGet(CACHE_KEY);
     }
   }),
 
@@ -214,7 +201,7 @@ const f1Router = router({
       try {
         const data = await fetchJolpica(`/${CURRENT_YEAR}/${input.round}/qualifying.json`);
         const race = data?.MRData?.RaceTable?.Races?.[0];
-        if (!race) return cacheGet(CACHE_KEY);
+        if (!race) return await cacheGet(CACHE_KEY);
         const result = {
           round: parseInt(race.round),
           raceName: race.raceName,
@@ -231,11 +218,11 @@ const f1Router = router({
           })),
           updatedAt: new Date().toISOString(),
         };
-        cacheSet(CACHE_KEY, result);
+        await cacheSet(CACHE_KEY, result);
         return result;
       } catch (err) {
         console.error("[F1 API] qualifying error:", err);
-        return cacheGet(CACHE_KEY);
+        return await cacheGet(CACHE_KEY);
       }
     }),
 });

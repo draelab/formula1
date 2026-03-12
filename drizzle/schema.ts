@@ -25,4 +25,9 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/** Server-side cache for external API responses (F1 data). */
+export const apiCache = mysqlTable("api_cache", {
+  key: varchar("cache_key", { length: 128 }).primaryKey(),
+  data: text("data").notNull(),
+  cachedAt: timestamp("cachedAt").defaultNow().notNull(),
+});

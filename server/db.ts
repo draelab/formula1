@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, apiCache } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,47 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ─── API Cache ────────────────────────────────────────────────────────────────
+
+// In-memory layer for fast reads (populated from DB on miss)
+const memCache = new Map<string, { data: any; cachedAt: string }>();
+
+export async function cacheSet(key: string, data: any): Promise<void> {
+  const cachedAt = new Date().toISOString();
+  memCache.set(key, { data, cachedAt });
+
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const json = JSON.stringify(data);
+    await db.insert(apiCache).values({ key, data: json, cachedAt: new Date() })
+      .onDuplicateKeyUpdate({ set: { data: json, cachedAt: new Date() } });
+  } catch (err) {
+    console.warn("[Cache] Failed to write to DB:", err);
+  }
+}
+
+export async function cacheGet(key: string): Promise<any | null> {
+  // Try in-memory first
+  const mem = memCache.get(key);
+  if (mem) return { ...mem.data, updatedAt: mem.cachedAt, fromCache: true };
+
+  // Fall back to DB
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const rows = await db.select().from(apiCache).where(eq(apiCache.key, key)).limit(1);
+    if (rows.length === 0) return null;
+
+    const parsed = JSON.parse(rows[0].data);
+    const cachedAt = rows[0].cachedAt.toISOString();
+    // Populate in-memory cache for next time
+    memCache.set(key, { data: parsed, cachedAt });
+    return { ...parsed, updatedAt: cachedAt, fromCache: true };
+  } catch (err) {
+    console.warn("[Cache] Failed to read from DB:", err);
+    return null;
+  }
+}
