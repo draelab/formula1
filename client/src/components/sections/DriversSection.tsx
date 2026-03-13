@@ -194,8 +194,8 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
           <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest mb-4">Championship Points — All Drivers</div>
           <ResponsiveContainer width="100%" height={380}>
             <BarChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
-              <XAxis dataKey="name" tick={{ fontSize: 12, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 12, fontFamily: "IBM Plex Mono", fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12, fontFamily: "IBM Plex Mono", fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="points" radius={[2, 2, 0, 0]}>
                 {chartData.map((entry: any, index: number) => (

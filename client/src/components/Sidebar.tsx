@@ -36,12 +36,16 @@ const NAV_ITEMS = [
 const completedRaces = RACES_2026.filter(r => r.status === "completed");
 const nextRace = RACES_2026.find(r => r.status === "next");
 
-export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+interface SidebarContentProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+  onMobileClose: () => void;
+}
 
-  const SidebarContent = () => {
-    const { theme, toggleTheme } = useTheme();
-    return (
+function SidebarContent({ activeSection, onSectionChange, onMobileClose }: SidebarContentProps) {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-white/10">
@@ -69,7 +73,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
               key={item.id}
               onClick={() => {
                 onSectionChange(item.id);
-                setMobileOpen(false);
+                onMobileClose();
               }}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm transition-all duration-200 mb-0.5 text-left",
@@ -87,7 +91,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
 
         {/* Race Status */}
         <div className="mt-6 mb-2 px-3 text-white/30 text-[13px] f1-mono uppercase tracking-widest">Season Progress</div>
-        
+
         {nextRace && (
           <div className="mx-3 mb-3 p-3 bg-[#E8002D]/15 border border-[#E8002D]/30 rounded-sm">
             <div className="flex items-center gap-1.5 mb-1">
@@ -148,7 +152,10 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       </div>
     </div>
   );
-  };
+}
+
+export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
@@ -170,7 +177,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-sidebar h-screen sticky top-0 shrink-0">
-        <SidebarContent />
+        <SidebarContent activeSection={activeSection} onSectionChange={onSectionChange} onMobileClose={() => setMobileOpen(false)} />
       </aside>
 
       {/* Mobile sidebar */}
@@ -180,7 +187,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <SidebarContent />
+        <SidebarContent activeSection={activeSection} onSectionChange={onSectionChange} onMobileClose={() => setMobileOpen(false)} />
       </aside>
     </>
   );
