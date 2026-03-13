@@ -2,7 +2,7 @@
 // Design: Data-driven predictions derived from live standings and race results
 
 import { useMemo } from "react";
-import { RACES_2026, DRIVERS_2026, TEAM_COLORS, RACE_CIRCUIT_IDS } from "@/lib/f1Data";
+import { RACES_2026, DRIVERS_2026 } from "@/lib/f1Data";
 import { useDriverStandings, useConstructorStandings, useRaceResults } from "@/hooks/useF1LiveData";
 import { TrendingUp, Target, Zap, Trophy, AlertTriangle, Loader2 } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";

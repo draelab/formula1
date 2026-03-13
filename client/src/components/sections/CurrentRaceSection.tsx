@@ -10,9 +10,9 @@ import {
   usePracticeSessions,
   useDriverStandings,
 } from "@/hooks/useF1LiveData";
-import { RACES_2026, VENUE_IMAGES, TEAM_COLORS } from "@/lib/f1Data";
+import { RACES_2026, VENUE_IMAGES } from "@/lib/f1Data";
 import { cn } from "@/lib/utils";
-import { Calendar, Clock, Trophy, Flag, Zap } from "lucide-react";
+import { Clock, Trophy, Zap } from "lucide-react";
 
 // ─── Circuit name mapping for OpenF1 API ─────────────────────────────────────
 const CIRCUIT_SHORT_NAMES: Record<string, string> = {
@@ -79,18 +79,6 @@ function formatLapTime(seconds: number): string {
   return `${mins}:${secs.toFixed(3).padStart(6, "0")}`;
 }
 
-function formatDate(dateStr: string): string {
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("en-GB", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-    });
-  } catch {
-    return dateStr;
-  }
-}
 
 export default function CurrentRaceSection() {
   const { races: scheduleRaces, isLoading: scheduleLoading } = useSchedule();
@@ -330,8 +318,6 @@ export default function CurrentRaceSection() {
 
       {/* Weekend schedule */}
       <WeekendSchedule
-        staticRace={staticRace}
-        scheduleRace={scheduleRace}
         isSprint={isSprint}
         raceResult={raceResult}
         qualifying={qualifying}
@@ -730,16 +716,12 @@ function PracticeTable({
 
 // ─── Weekend Schedule ────────────────────────────────────────────────────────
 function WeekendSchedule({
-  staticRace,
-  scheduleRace,
   isSprint,
   raceResult,
   qualifying,
   sprint,
   practice,
 }: {
-  staticRace: any;
-  scheduleRace: any;
   isSprint: boolean;
   raceResult: any;
   qualifying: any;

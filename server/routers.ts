@@ -317,7 +317,8 @@ const f1Router = router({
         const races = data?.MRData?.RaceTable?.Races ?? [];
 
         // Only keep recent years (last 10)
-        const recentRaces = races.filter((r: any) => parseInt(r.season) >= 2016);
+        const cutoff = CURRENT_YEAR - 10;
+        const recentRaces = races.filter((r: any) => parseInt(r.season) >= cutoff);
 
         const result = {
           circuitId: input.circuitId,
