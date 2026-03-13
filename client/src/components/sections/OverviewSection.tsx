@@ -13,7 +13,7 @@ interface OverviewSectionProps {
 }
 
 export default function OverviewSection({ onSectionChange }: OverviewSectionProps) {
-  const { standings: driverStandings, isLoading: driversLoading } = useDriverStandings();
+  const { standings: driverStandings } = useDriverStandings();
   const { standings: constructorStandings } = useConstructorStandings();
   const { races: liveRaceResults } = useRaceResults();
   const { races: liveSchedule } = useSchedule();
@@ -150,7 +150,7 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
             </div>
           </div>
 
-          {/* Top 5 Results */}
+          {/* Top 8 Results */}
           <div className="space-y-0">
             {raceTop8.map((result: any, idx: number) => {
               const teamColor = TEAM_COLORS[result.team] || "#666";
