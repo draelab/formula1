@@ -64,7 +64,7 @@ export default function ConstructorProfileModal({
   useEffect(() => { setTechOpen(false); }, [teamName]);
   const { races, isLoading: racesLoading } = useRaceResults();
 
-  const constructor = teamName ? CONSTRUCTORS_2026.find((c) => c.name === teamName) : null;
+  const constructorData = teamName ? CONSTRUCTORS_2026.find((c) => c.name === teamName) : null;
   const carSpec = teamName ? CAR_SPECS_2026.find((c) => c.team === teamName) : null;
   const teamDrivers = teamName ? DRIVERS_2026.filter((d) => d.team === teamName) : [];
   const teamColor = teamName ? TEAM_COLORS[teamName] || "#888" : "#888";
@@ -123,7 +123,7 @@ export default function ConstructorProfileModal({
               {teamName}
             </h2>
             <div className="text-white/70 text-sm f1-mono">
-              {constructor?.chassis} · {constructor?.powerUnit}
+              {constructorData?.chassis} · {constructorData?.powerUnit}
             </div>
           </div>
         </div>
@@ -141,11 +141,11 @@ export default function ConstructorProfileModal({
                   className="w-10 h-10 rounded-sm flex items-center justify-center text-white font-black f1-stat-number text-lg"
                   style={{ backgroundColor: teamColor }}
                 >
-                  P{constructor?.position}
+                  P{constructorData?.position}
                 </div>
                 <div>
                   <div className="f1-display text-2xl font-black uppercase text-[#1A1A2E]">{teamName}</div>
-                  <div className="text-xs text-gray-500 f1-mono">{constructor?.chassis} · {constructor?.powerUnit}</div>
+                  <div className="text-xs text-gray-500 f1-mono">{constructorData?.chassis} · {constructorData?.powerUnit}</div>
                 </div>
               </div>
 
@@ -197,10 +197,10 @@ export default function ConstructorProfileModal({
           {/* Stats Row */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { label: "POSITION", value: constructor?.position ?? "—", icon: Hash },
-              { label: "POINTS", value: constructor?.points ?? "—", icon: Gauge },
-              { label: "WINS", value: constructor?.wins ?? "—", icon: Trophy },
-              { label: "PODIUMS", value: constructor?.podiums ?? "—", icon: Trophy },
+              { label: "POSITION", value: constructorData?.position ?? "—", icon: Hash },
+              { label: "POINTS", value: constructorData?.points ?? "—", icon: Gauge },
+              { label: "WINS", value: constructorData?.wins ?? "—", icon: Trophy },
+              { label: "PODIUMS", value: constructorData?.podiums ?? "—", icon: Trophy },
             ].map(({ label, value, icon: Icon }) => (
               <div key={label} className="bg-white rounded-sm p-3 border border-gray-100 text-center">
                 <Icon size={14} className="mx-auto mb-1 text-gray-300" />
@@ -211,7 +211,7 @@ export default function ConstructorProfileModal({
           </div>
 
           {/* Latest Race Result */}
-          {(racesLoading || latestRaceResult || constructor?.australiaResult) && (
+          {(racesLoading || latestRaceResult || constructorData?.australiaResult) && (
             <div className="bg-[#1A1A2E] rounded-sm p-4">
               {racesLoading ? (
                 <div className="text-white/40 text-xs f1-mono uppercase tracking-widest">Loading latest result...</div>
@@ -232,12 +232,12 @@ export default function ConstructorProfileModal({
                     ))}
                   </div>
                 </>
-              ) : constructor?.australiaResult ? (
+              ) : constructorData?.australiaResult ? (
                 <>
                   <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
                     Australian GP Result
                   </div>
-                  <div className="text-white font-bold f1-mono text-sm">{constructor.australiaResult}</div>
+                  <div className="text-white font-bold f1-mono text-sm">{constructorData.australiaResult}</div>
                 </>
               ) : null}
             </div>
