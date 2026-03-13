@@ -52,18 +52,18 @@ export default function ConstructorsSection({ initialTeam }: ConstructorsSection
       <div className="flex items-center gap-3 mb-6">
         <div className="w-1 h-8 bg-[#E8002D]" />
         <div>
-          <div className="text-[#E8002D] text-xs f1-mono uppercase tracking-widest">2026 Season</div>
+          <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">2026 Season</div>
           <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Constructors</h2>
         </div>
       </div>
 
       {/* Points Chart */}
       <div className="bg-white border border-gray-100 rounded-sm p-5 shadow-sm mb-6">
-        <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-4">Championship Points — After Round 1</div>
+        <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-4">Championship Points — After Round 1</div>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 20 }}>
-            <XAxis dataKey="name" tick={{ fontSize: 10, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} angle={-30} textAnchor="end" />
-            <YAxis tick={{ fontSize: 11, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 12, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} angle={-30} textAnchor="end" />
+            <YAxis tick={{ fontSize: 13, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
             <Bar dataKey="points" radius={[2, 2, 0, 0]}>
               {chartData.map((entry: any, index: number) => (
@@ -88,14 +88,14 @@ export default function ConstructorsSection({ initialTeam }: ConstructorsSection
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-10 rounded-full shrink-0" style={{ backgroundColor: color }} />
                   <div>
-                    <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest">P{team.position}</div>
+                    <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest">P{team.position}</div>
                     <div className="f1-display text-lg font-bold text-[#1A1A2E] leading-tight">{team.name}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">{team.chassis}</div>
+                    <div className="text-sm text-gray-400 mt-0.5">{team.chassis}</div>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="f1-stat-number text-3xl font-black text-[#1A1A2E]">{team.points}</div>
-                  <div className="text-xs text-gray-400 f1-mono">PTS</div>
+                  <div className="text-sm text-gray-400 f1-mono">PTS</div>
                 </div>
               </div>
 
@@ -114,20 +114,20 @@ export default function ConstructorsSection({ initialTeam }: ConstructorsSection
               <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-50">
                 <div className="text-center">
                   <div className="f1-stat-number text-xl font-black text-[#1A1A2E]">{team.wins}</div>
-                  <div className="text-xs text-gray-400 f1-mono">Wins</div>
+                  <div className="text-sm text-gray-400 f1-mono">Wins</div>
                 </div>
                 <div className="text-center">
                   <div className="f1-stat-number text-xl font-black text-[#1A1A2E]">{team.podiums}</div>
-                  <div className="text-xs text-gray-400 f1-mono">Podiums</div>
+                  <div className="text-sm text-gray-400 f1-mono">Podiums</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs font-medium text-gray-600 f1-mono">{team.australiaResult}</div>
-                  <div className="text-xs text-gray-400 f1-mono">AUS</div>
+                  <div className="text-sm font-medium text-gray-600 f1-mono">{team.australiaResult}</div>
+                  <div className="text-sm text-gray-400 f1-mono">AUS</div>
                 </div>
               </div>
 
               <div className="mt-3 pt-2 border-t border-gray-50">
-                <div className="text-xs text-gray-400 f1-mono truncate">{team.powerUnit}</div>
+                <div className="text-sm text-gray-400 f1-mono truncate">{team.powerUnit}</div>
               </div>
             </div>
           );
@@ -138,6 +138,8 @@ export default function ConstructorsSection({ initialTeam }: ConstructorsSection
         teamName={modalTeam}
         open={modalOpen}
         onOpenChange={setModalOpen}
+        teamNames={constructors.map((c: any) => c.name)}
+        onTeamChange={(name) => setModalTeam(name)}
       />
     </div>
   );

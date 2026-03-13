@@ -180,6 +180,58 @@ export function useSchedule() {
   };
 }
 
+// ─── Qualifying Hook ─────────────────────────────────────────────────────────
+export function useQualifying(round: number | null) {
+  const { data, isLoading } = trpc.f1.qualifying.useQuery(
+    { round: round! },
+    {
+      enabled: round !== null && round > 0,
+      staleTime: 1000 * 60 * 10,
+      retry: 2,
+    }
+  );
+  return { qualifying: data, isLoading };
+}
+
+// ─── Sprint Results Hook ─────────────────────────────────────────────────────
+export function useSprintResults(round: number | null) {
+  const { data, isLoading } = trpc.f1.sprintResults.useQuery(
+    { round: round! },
+    {
+      enabled: round !== null && round > 0,
+      staleTime: 1000 * 60 * 10,
+      retry: 2,
+    }
+  );
+  return { sprint: data, isLoading };
+}
+
+// ─── Practice Sessions Hook ─────────────────────────────────────────────────
+export function usePracticeSessions(circuitShortName: string | null) {
+  const { data, isLoading } = trpc.f1.practiceSessions.useQuery(
+    { circuitShortName: circuitShortName! },
+    {
+      enabled: !!circuitShortName,
+      staleTime: 1000 * 60 * 10,
+      retry: 2,
+    }
+  );
+  return { practice: data, isLoading };
+}
+
+// ─── Circuit History Hook ────────────────────────────────────────────────────
+export function useCircuitHistory(circuitId: string | null) {
+  const { data, isLoading } = trpc.f1.circuitHistory.useQuery(
+    { circuitId: circuitId! },
+    {
+      enabled: !!circuitId,
+      staleTime: 1000 * 60 * 60 * 24, // 24 hours - historical data rarely changes
+      retry: 2,
+    }
+  );
+  return { history: data, isLoading };
+}
+
 // ─── Latest Session Hook ──────────────────────────────────────────────────────
 export function useLatestSession() {
   const { data, isLoading } = trpc.f1.latestSession.useQuery(undefined, {

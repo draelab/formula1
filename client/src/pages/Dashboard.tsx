@@ -3,22 +3,33 @@
 // Swiss typographic grid meets motorsport data journalism
 
 import { useState } from "react";
+import { useParams, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import OverviewSection from "@/components/sections/OverviewSection";
 import DriversSection from "@/components/sections/DriversSection";
 import ConstructorsSection from "@/components/sections/ConstructorsSection";
 import RacesSection from "@/components/sections/RacesSection";
 import PredictionsSection from "@/components/sections/PredictionsSection";
+import CurrentRaceSection from "@/components/sections/CurrentRaceSection";
 
-type Section = "overview" | "drivers" | "constructors" | "races" | "predictions";
+type Section = "overview" | "drivers" | "constructors" | "races" | "current-race" | "predictions";
+
+const VALID_SECTIONS: Set<string> = new Set<string>([
+  "overview", "drivers", "constructors", "races", "current-race", "predictions",
+]);
 
 export default function Dashboard() {
-  const [activeSection, setActiveSection] = useState<Section>("overview");
+  const params = useParams<{ section: string }>();
+  const [, setLocation] = useLocation();
   const [teamContext, setTeamContext] = useState<string | undefined>(undefined);
+
+  const activeSection: Section = VALID_SECTIONS.has(params.section ?? "")
+    ? (params.section as Section)
+    : "overview";
 
   const navigateToSection = (section: string, team?: string) => {
     setTeamContext(team);
-    setActiveSection(section as Section);
+    setLocation(`/${section}`);
   };
 
   const renderSection = () => {
@@ -36,6 +47,8 @@ export default function Dashboard() {
         return <ConstructorsSection key={teamContext} initialTeam={teamContext} />;
       case "races":
         return <RacesSection />;
+      case "current-race":
+        return <CurrentRaceSection />;
       case "predictions":
         return <PredictionsSection />;
       default:
@@ -48,7 +61,7 @@ export default function Dashboard() {
       {/* Sidebar */}
       <Sidebar activeSection={activeSection} onSectionChange={(s) => {
         setTeamContext(undefined);
-        setActiveSection(s as Section);
+        setLocation(`/${s}`);
       }} />
 
       {/* Main Content */}

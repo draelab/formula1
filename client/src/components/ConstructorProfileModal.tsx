@@ -21,12 +21,14 @@ import {
   Radar,
   ResponsiveContainer,
 } from "recharts";
-import { Trophy, Gauge, Hash, Zap, Settings, ChevronDown, CheckCircle, XCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trophy, Gauge, Hash, Zap, Settings, ChevronDown, CheckCircle, XCircle } from "lucide-react";
 
 interface ConstructorProfileModalProps {
   teamName: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  teamNames?: string[];
+  onTeamChange?: (teamName: string) => void;
 }
 
 const RADAR_DATA_2026: Record<string, number[]> = {
@@ -59,10 +61,16 @@ export default function ConstructorProfileModal({
   teamName,
   open,
   onOpenChange,
+  teamNames,
+  onTeamChange,
 }: ConstructorProfileModalProps) {
   const [techOpen, setTechOpen] = useState(false);
   useEffect(() => { setTechOpen(false); }, [teamName]);
   const { races, isLoading: racesLoading } = useRaceResults();
+
+  const currentIndex = teamName && teamNames ? teamNames.indexOf(teamName) : -1;
+  const hasPrev = teamNames && currentIndex > 0;
+  const hasNext = teamNames && currentIndex >= 0 && currentIndex < teamNames.length - 1;
 
   const constructorData = teamName ? CONSTRUCTORS_2026.find((c) => c.name === teamName) : null;
   const carSpec = teamName ? CAR_SPECS_2026.find((c) => c.team === teamName) : null;
@@ -85,10 +93,33 @@ export default function ConstructorProfileModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
+        className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0 relative"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{teamName} — Constructor Profile</DialogTitle>
+
+        {/* Navigation buttons */}
+        <div className="sticky top-0 left-0 right-0 h-0 z-50 pointer-events-none" style={{ top: 'calc(50vh - 60px)' }}>
+          {hasPrev && (
+            <button
+              onClick={() => onTeamChange?.(teamNames![currentIndex - 1])}
+              aria-label="Previous team"
+              className="absolute left-3 w-10 h-10 rounded-full bg-black/30 text-white flex items-center justify-center hover:bg-black/50 transition-colors pointer-events-auto"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          )}
+          {hasNext && (
+            <button
+              onClick={() => onTeamChange?.(teamNames![currentIndex + 1])}
+              aria-label="Next team"
+              className="absolute right-3 w-10 h-10 rounded-full bg-black/30 text-white flex items-center justify-center hover:bg-black/50 transition-colors pointer-events-auto"
+            >
+              <ChevronRight size={20} />
+            </button>
+          )}
+        </div>
+
         {!teamName ? null : (<>
 
         {/* Header band — team color background */}
@@ -123,7 +154,7 @@ export default function ConstructorProfileModal({
             <h2 className="f1-display text-2xl md:text-3xl font-black uppercase leading-none text-white drop-shadow-lg">
               {teamName}
             </h2>
-            <div className="text-white/70 text-xs f1-mono mt-1 drop-shadow">
+            <div className="text-white/70 text-sm f1-mono mt-1 drop-shadow">
               {constructorData?.chassis} · {constructorData?.powerUnit}
             </div>
           </div>
@@ -160,7 +191,7 @@ export default function ConstructorProfileModal({
                 </div>
                 <div>
                   <div className="f1-display text-2xl font-black uppercase text-[#1A1A2E]">{teamName}</div>
-                  <div className="text-xs text-gray-500 f1-mono">{constructorData?.chassis} · {constructorData?.powerUnit}</div>
+                  <div className="text-sm text-gray-500 f1-mono">{constructorData?.chassis} · {constructorData?.powerUnit}</div>
                 </div>
               </div>
 
@@ -173,7 +204,7 @@ export default function ConstructorProfileModal({
               {carSpec?.keyFeatures && carSpec.keyFeatures.length > 0 && (
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
                   {carSpec.keyFeatures.map((feat, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                    <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
                       <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: teamColor }} />
                       <span className="leading-relaxed">{feat}</span>
                     </div>
@@ -184,7 +215,7 @@ export default function ConstructorProfileModal({
 
             {/* Right column — 2026 Drivers */}
             <div>
-              <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">2026 Drivers</div>
+              <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">2026 Drivers</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {teamDrivers.map((driver) => (
                   <div key={driver.number} className="bg-white border border-gray-100 rounded-sm p-3">
@@ -197,7 +228,7 @@ export default function ConstructorProfileModal({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-[#1A1A2E]">{driver.name}</div>
-                        <div className="text-xs text-gray-400 f1-mono">
+                        <div className="text-sm text-gray-400 f1-mono">
                           {driver.nationality} {driver.flag} · {driver.points} pts
                         </div>
                       </div>
@@ -219,7 +250,7 @@ export default function ConstructorProfileModal({
               <div key={label} className="bg-white rounded-sm p-3 border border-gray-100 text-center">
                 <Icon size={14} className="mx-auto mb-1 text-gray-300" />
                 <div className="font-black f1-stat-number text-lg text-[#1A1A2E]">{value}</div>
-                <div className="text-[10px] text-gray-400 f1-mono">{label}</div>
+                <div className="text-xs text-gray-400 f1-mono">{label}</div>
               </div>
             ))}
           </div>
@@ -228,13 +259,13 @@ export default function ConstructorProfileModal({
           <div className={`grid gap-4 ${(racesLoading || latestRaceResult || constructorData?.australiaResult) ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
             {/* Performance Radar */}
             <div className="bg-white border border-gray-100 rounded-sm p-4 shadow-sm">
-              <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Performance Indices</div>
+              <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">Performance Indices</div>
               <ResponsiveContainer width="100%" height={240}>
                 <RadarChart data={getRadarData(teamName)}>
                   <PolarGrid stroke="#e5e7eb" />
                   <PolarAngleAxis
                     dataKey="subject"
-                    tick={{ fontSize: 10, fontFamily: "IBM Plex Mono", fill: "#888" }}
+                    tick={{ fontSize: 12, fontFamily: "IBM Plex Mono", fill: "#888" }}
                   />
                   <Radar
                     name={teamName}
@@ -246,17 +277,17 @@ export default function ConstructorProfileModal({
                   />
                 </RadarChart>
               </ResponsiveContainer>
-              <div className="text-xs text-gray-400 f1-mono text-center mt-1">Estimated performance indices</div>
+              <div className="text-sm text-gray-400 f1-mono text-center mt-1">Estimated performance indices</div>
             </div>
 
             {/* Latest Race Result */}
             {(racesLoading || latestRaceResult || constructorData?.australiaResult) && (
               <div className="bg-[#1A1A2E] rounded-sm p-4">
                 {racesLoading ? (
-                  <div className="text-white/40 text-xs f1-mono uppercase tracking-widest">Loading latest result...</div>
+                  <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest">Loading latest result...</div>
                 ) : latestRaceResult ? (
                   <>
-                    <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
+                    <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-2">
                       Latest Race — {latestRaceResult.race.name}
                     </div>
                     <div className="space-y-2">
@@ -266,14 +297,14 @@ export default function ConstructorProfileModal({
                             <span className="text-white font-black f1-stat-number text-sm">P{r.position}</span>
                             <span className="text-white text-sm">{r.driver}</span>
                           </div>
-                          <span className="text-white/60 text-xs f1-mono">{r.points} pts</span>
+                          <span className="text-white/60 text-sm f1-mono">{r.points} pts</span>
                         </div>
                       ))}
                     </div>
                   </>
                 ) : constructorData?.australiaResult ? (
                   <>
-                    <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
+                    <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-2">
                       Australian GP Result
                     </div>
                     <div className="text-white font-bold f1-mono text-sm">{constructorData.australiaResult}</div>
@@ -315,7 +346,7 @@ export default function ConstructorProfileModal({
                     { label: "Active Aero", value: carSpec.activeAero ? "Yes — X/Z Mode" : "No" },
                   ].map(({ label, value }) => (
                     <div key={label} className="bg-gray-50 rounded-sm p-2.5">
-                      <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest">{label}</div>
+                      <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest">{label}</div>
                       <div className="text-sm font-medium text-[#1A1A2E] mt-0.5 f1-mono">{value}</div>
                     </div>
                   ))}
@@ -331,7 +362,7 @@ export default function ConstructorProfileModal({
                     </div>
                     <div className="space-y-1.5">
                       {carSpec.strengths?.map((s, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                        <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
                           <span className="leading-relaxed">{s}</span>
                         </div>
@@ -347,7 +378,7 @@ export default function ConstructorProfileModal({
                     </div>
                     <div className="space-y-1.5">
                       {carSpec.weaknesses?.map((w, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                        <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
                           <span className="leading-relaxed">{w}</span>
                         </div>

@@ -3,14 +3,13 @@
 
 import { useState } from "react";
 import { Race, RACES_2026 } from "@/lib/f1Data";
-import { CheckCircle, Clock, Zap, MapPin, Timer, ChevronDown, ChevronUp, ChevronRight, Info } from "lucide-react";
+import { CheckCircle, Clock, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CircuitProfileModal from "@/components/CircuitProfileModal";
 
 const CIRCUIT_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310419663031769921/QfooNsf5N2WhwQZYmGVtwY/f1-circuit-abstract-3WGaeLDJCs6BJEEFCT6Lq9.webp";
 
 export default function RacesSection() {
-  const [expanded, setExpanded] = useState<number | null>(2); // Default open next race
   const [filter, setFilter] = useState<"all" | "completed" | "upcoming">("all");
   const [selectedRace, setSelectedRace] = useState<Race | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,7 +28,7 @@ export default function RacesSection() {
           <div className="flex items-center gap-3 mb-1">
             <div className="w-1 h-8 bg-[#E8002D]" />
             <div>
-              <div className="text-[#E8002D] text-xs f1-mono uppercase tracking-widest">2026 Season</div>
+              <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">2026 Season</div>
               <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Races</h2>
             </div>
           </div>
@@ -40,7 +39,7 @@ export default function RacesSection() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-sm transition-colors f1-mono capitalize ${filter === f ? "bg-[#1A1A2E] text-white" : "text-gray-500 hover:text-gray-700"}`}
+              className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors f1-mono capitalize ${filter === f ? "bg-[#1A1A2E] text-white" : "text-gray-500 hover:text-gray-700"}`}
             >
               {f.toUpperCase()}
             </button>
@@ -60,7 +59,7 @@ export default function RacesSection() {
           ].map(({ label, value }) => (
             <div key={label} className="text-center">
               <div className="text-white f1-stat-number text-3xl font-black">{value}</div>
-              <div className="text-white/50 text-xs f1-mono uppercase tracking-wider">{label}</div>
+              <div className="text-white/50 text-[13px] f1-mono uppercase tracking-wider">{label}</div>
             </div>
           ))}
         </div>
@@ -69,7 +68,6 @@ export default function RacesSection() {
       {/* Race List */}
       <div className="space-y-2">
         {filtered.map((race) => {
-          const isExpanded = expanded === race.round;
           const isCompleted = race.status === "completed";
           const isNext = race.status === "next";
 
@@ -85,7 +83,10 @@ export default function RacesSection() {
               {/* Race Row */}
               <div
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => setExpanded(isExpanded ? null : race.round)}
+                onClick={() => {
+                  setSelectedRace(race);
+                  setModalOpen(true);
+                }}
               >
                 {/* Round number */}
                 <div className={cn(
@@ -126,134 +127,17 @@ export default function RacesSection() {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-gray-400 f1-mono">{race.circuit}</div>
+                  <div className="text-sm text-gray-400 f1-mono">{race.circuit}</div>
                 </div>
 
                 {/* Date */}
                 <div className="text-right shrink-0 hidden sm:block">
                   <div className="text-sm text-gray-600 f1-mono">{race.date}</div>
                   {isCompleted && race.winner && (
-                    <div className="text-xs text-green-600 font-medium">🏆 {race.winner}</div>
+                    <div className="text-sm text-green-600 font-medium">🏆 {race.winner}</div>
                   )}
                 </div>
-
-                {/* Circuit Profile */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedRace(race);
-                    setModalOpen(true);
-                  }}
-                  className="shrink-0 p-1 rounded-sm text-gray-300 hover:text-[#E8002D] transition-colors cursor-pointer"
-                  title="View circuit details"
-                >
-                  <Info size={15} />
-                </button>
-
-                {/* Expand */}
-                <div className="shrink-0 ml-2">
-                  {isExpanded ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-300" />}
-                </div>
               </div>
-
-              {/* Expanded Details */}
-              {isExpanded && (
-                <div className="border-t border-gray-100 px-4 pb-4 pt-3 bg-gray-50/30">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Circuit Info */}
-                    <div>
-                      <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Circuit Details</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { label: "Length", value: race.circuitLength ? `${race.circuitLength} km` : "—" },
-                          { label: "Turns", value: race.turns || "—" },
-                          { label: "Race Distance", value: race.raceDistance ? `${race.raceDistance} km` : "—" },
-                          { label: "Laps", value: race.laps || "—" },
-                        ].map(({ label, value }) => (
-                          <div key={label} className="bg-white rounded-sm p-2 border border-gray-100">
-                            <div className="text-xs text-gray-400 f1-mono">{label}</div>
-                            <div className="font-semibold text-sm text-[#1A1A2E] f1-mono">{value}</div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {race.lapRecord && (
-                        <div className="mt-2 bg-white rounded-sm p-2 border border-gray-100 flex items-center gap-2">
-                          <Timer size={12} className="text-[#E8002D] shrink-0" />
-                          <div>
-                            <div className="text-xs text-gray-400 f1-mono">Lap Record</div>
-                            <div className="text-sm font-bold f1-mono text-[#1A1A2E]">{race.lapRecord} — {race.lapRecordHolder} ({race.lapRecordYear})</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Race Result or Description */}
-                    <div>
-                      {isCompleted ? (
-                        <div>
-                          <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Race Result</div>
-                          <div className="bg-[#1A1A2E] rounded-sm p-3 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-white/60 text-xs f1-mono">Winner</span>
-                              <span className="text-yellow-400 font-bold text-sm">🏆 {race.winner}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-white/60 text-xs f1-mono">Team</span>
-                              <span className="text-white text-sm">{race.winnerTeam}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-white/60 text-xs f1-mono">Pole Position</span>
-                              <span className="text-white text-sm">{race.polePosition}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-white/60 text-xs f1-mono">Fastest Lap</span>
-                              <span className="text-[#E8002D] text-sm">{race.fastestLap}</span>
-                            </div>
-                          </div>
-                          {race.description && (
-                            <p className="text-xs text-gray-500 mt-2 leading-relaxed">{race.description}</p>
-                          )}
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">
-                            {isNext ? "Race Preview" : "Circuit Overview"}
-                          </div>
-                          <p className="text-sm text-gray-600 leading-relaxed">{race.description}</p>
-                          {race.prediction && (
-                            <div className="mt-3 bg-[#1A1A2E] rounded-sm p-3">
-                              <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Prediction</div>
-                              <p className="text-white/80 text-xs leading-relaxed">{race.prediction}</p>
-                              {race.predictionFavorite && (
-                                <div className="mt-2 flex items-center gap-2">
-                                  <span className="text-white/40 text-xs f1-mono">Favourite:</span>
-                                  <span className="text-[#E8002D] text-sm font-bold f1-display">{race.predictionFavorite}</span>
-                                  {race.predictionOdds && <span className="text-white/40 text-xs f1-mono">({race.predictionOdds})</span>}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* View Details button */}
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedRace(race);
-                        setModalOpen(true);
-                      }}
-                      className="text-xs f1-mono font-medium text-[#E8002D] flex items-center gap-1 hover:gap-2 transition-all cursor-pointer"
-                    >
-                      View Circuit Profile <ChevronRight size={12} />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
@@ -263,6 +147,8 @@ export default function RacesSection() {
         race={selectedRace}
         open={modalOpen}
         onOpenChange={setModalOpen}
+        races={RACES_2026}
+        onRaceChange={(r) => setSelectedRace(r)}
       />
     </div>
   );

@@ -792,6 +792,63 @@ export const RACES_2026: Race[] = [
   },
 ];
 
+const VENUE_BASE = "https://media.formula1.com/image/upload/f_auto,c_limit,w_1440,q_auto/f_auto/q_auto/content/dam/fom-website/2018-redesign-assets/Racehub header images 16x9";
+
+export const VENUE_IMAGES: Record<string, string> = {
+  "Australian Grand Prix": `${VENUE_BASE}/Australia`,
+  "Chinese Grand Prix": `${VENUE_BASE}/China`,
+  "Japanese Grand Prix": `${VENUE_BASE}/Japan`,
+  "Bahrain Grand Prix": `${VENUE_BASE}/Bahrain`,
+  "Saudi Arabian Grand Prix": `${VENUE_BASE}/Saudi_Arabia`,
+  "Miami Grand Prix": `${VENUE_BASE}/Miami`,
+  "Emilia Romagna Grand Prix": `${VENUE_BASE}/Emilia%20Romagna`,
+  "Monaco Grand Prix": `${VENUE_BASE}/Monaco`,
+  "Spanish Grand Prix": `${VENUE_BASE}/Spain`,
+  "Canadian Grand Prix": `${VENUE_BASE}/Canada`,
+  "Austrian Grand Prix": `${VENUE_BASE}/Austria`,
+  "British Grand Prix": `${VENUE_BASE}/Great%20Britain`,
+  "Belgian Grand Prix": `${VENUE_BASE}/Belgium`,
+  "Hungarian Grand Prix": `${VENUE_BASE}/Hungary`,
+  "Dutch Grand Prix": `${VENUE_BASE}/Netherlands`,
+  "Italian Grand Prix": `${VENUE_BASE}/Italy`,
+  "Azerbaijan Grand Prix": `${VENUE_BASE}/Azerbaijan`,
+  "Singapore Grand Prix": `${VENUE_BASE}/Singapore`,
+  "United States Grand Prix": `${VENUE_BASE}/USA`,
+  "Mexico City Grand Prix": `${VENUE_BASE}/Mexico`,
+  "São Paulo Grand Prix": `${VENUE_BASE}/Brazil`,
+  "Las Vegas Grand Prix": `${VENUE_BASE}/Las%20Vegas`,
+  "Qatar Grand Prix": `${VENUE_BASE}/Qatar`,
+  "Abu Dhabi Grand Prix": `${VENUE_BASE}/Abu%20Dhabi`,
+};
+
+// ─── Race name → Jolpica circuitId mapping for predictions ──────────────────
+export const RACE_CIRCUIT_IDS: Record<string, string> = {
+  "Australian Grand Prix": "albert_park",
+  "Chinese Grand Prix": "shanghai",
+  "Japanese Grand Prix": "suzuka",
+  "Bahrain Grand Prix": "bahrain",
+  "Saudi Arabian Grand Prix": "jeddah",
+  "Miami Grand Prix": "miami",
+  "Canadian Grand Prix": "villeneuve",
+  "Monaco Grand Prix": "monaco",
+  "Barcelona-Catalunya Grand Prix": "catalunya",
+  "Austrian Grand Prix": "red_bull_ring",
+  "British Grand Prix": "silverstone",
+  "Belgian Grand Prix": "spa",
+  "Hungarian Grand Prix": "hungaroring",
+  "Dutch Grand Prix": "zandvoort",
+  "Italian Grand Prix": "monza",
+  "Spanish Grand Prix": "madrid",
+  "Azerbaijan Grand Prix": "baku",
+  "Singapore Grand Prix": "marina_bay",
+  "United States Grand Prix": "americas",
+  "Mexico City Grand Prix": "rodriguez",
+  "São Paulo Grand Prix": "interlagos",
+  "Las Vegas Grand Prix": "las_vegas",
+  "Qatar Grand Prix": "losail",
+  "Abu Dhabi Grand Prix": "yas_marina",
+};
+
 export interface CarSpec {
   team: string;
   chassis: string;

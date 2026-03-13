@@ -7,19 +7,27 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trophy, Timer, MapPin, Mountain, Ruler, CornerDownRight, Flag, Zap } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trophy, Timer, MapPin, Mountain, Ruler, CornerDownRight, Flag, Zap } from "lucide-react";
 
 interface CircuitProfileModalProps {
   race: Race | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  races?: Race[];
+  onRaceChange?: (race: Race) => void;
 }
 
 export default function CircuitProfileModal({
   race,
   open,
   onOpenChange,
+  races,
+  onRaceChange,
 }: CircuitProfileModalProps) {
+  const currentIndex = race && races ? races.findIndex((r) => r.round === race.round) : -1;
+  const hasPrev = races && currentIndex > 0;
+  const hasNext = races && currentIndex >= 0 && currentIndex < races.length - 1;
+
   const isCompleted = race?.status === "completed";
   const isNext = race?.status === "next";
   const typeLabel = race?.circuitType === "street" ? "STREET" : race?.circuitType === "hybrid" ? "HYBRID" : "PERMANENT";
@@ -27,10 +35,33 @@ export default function CircuitProfileModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-5xl max-h-[85vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
+        className="sm:max-w-6xl max-h-[85vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0 relative"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{race?.name ?? "Circuit"} — Circuit Profile</DialogTitle>
+
+        {/* Navigation buttons */}
+        <div className="sticky top-0 left-0 right-0 h-0 z-50 pointer-events-none" style={{ top: 'calc(50vh - 60px)' }}>
+          {hasPrev && (
+            <button
+              onClick={() => onRaceChange?.(races![currentIndex - 1])}
+              aria-label="Previous race"
+              className="absolute left-3 w-10 h-10 rounded-full bg-black/30 text-white flex items-center justify-center hover:bg-black/50 transition-colors pointer-events-auto"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          )}
+          {hasNext && (
+            <button
+              onClick={() => onRaceChange?.(races![currentIndex + 1])}
+              aria-label="Next race"
+              className="absolute right-3 w-10 h-10 rounded-full bg-black/30 text-white flex items-center justify-center hover:bg-black/50 transition-colors pointer-events-auto"
+            >
+              <ChevronRight size={20} />
+            </button>
+          )}
+        </div>
+
         {!race ? null : (<>
 
         {/* Header band */}
@@ -44,10 +75,10 @@ export default function CircuitProfileModal({
             ✕
           </button>
 
-          <div className="flex flex-col items-center p-6 pb-5">
-            {/* Track layout image — primary focus */}
+          {/* Track layout image — primary focus */}
+          <div className="flex flex-col items-center p-6 pb-16">
             {race.trackImage && (
-              <div className="w-full max-w-lg flex items-center justify-center mb-5">
+              <div className="w-full max-w-2xl mx-auto flex items-center justify-center">
                 <img
                   src={race.trackImage}
                   alt={`${race.circuit} layout`}
@@ -58,32 +89,37 @@ export default function CircuitProfileModal({
                 />
               </div>
             )}
+          </div>
 
-            {/* Race info — below track image */}
-            <div className="text-white text-center w-full">
-              <h2 className="f1-display text-3xl md:text-4xl font-black uppercase leading-none mb-2">
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-transparent to-transparent h-40 pointer-events-none" />
+
+          {/* Race info overlay — bottom-left */}
+          <div className="absolute bottom-0 left-0 p-6 z-[1]">
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="f1-display text-3xl md:text-4xl font-black uppercase leading-none text-white">
                 {race.name}
               </h2>
-              <div className="text-white/70 text-sm f1-mono mb-2">{race.circuit}</div>
-              <div className="flex items-center justify-center gap-4 text-sm text-white/80 flex-wrap">
-                <span className="text-white/50 text-xs f1-mono uppercase tracking-widest">
-                  Round {race.round} · {race.date}
+              {race.isSprint && (
+                <span className="bg-yellow-400 text-[#1A1A2E] px-2 py-0.5 text-xs font-bold f1-mono rounded-sm flex items-center gap-1">
+                  <Zap size={10} /> SPRINT
                 </span>
-                <span className="flex items-center gap-1">
-                  <span className="text-lg">{race.flag}</span>
-                  {race.location}, {race.country}
+              )}
+              {isNext && (
+                <span className="bg-[#E8002D] text-white px-2 py-0.5 text-xs font-bold f1-mono rounded-sm">
+                  NEXT RACE
                 </span>
-                {race.isSprint && (
-                  <span className="bg-yellow-400 text-[#1A1A2E] px-2 py-0.5 text-xs font-bold f1-mono rounded-sm flex items-center gap-1">
-                    <Zap size={10} /> SPRINT
-                  </span>
-                )}
-                {isNext && (
-                  <span className="bg-[#E8002D] text-white px-2 py-0.5 text-xs font-bold f1-mono rounded-sm">
-                    NEXT RACE
-                  </span>
-                )}
-              </div>
+              )}
+            </div>
+            <div className="text-white/70 text-sm f1-mono mb-1">{race.circuit}</div>
+            <div className="flex items-center gap-3 text-sm text-white/80 flex-wrap">
+              <span className="text-white/50 text-[13px] f1-mono uppercase tracking-widest">
+                Round {race.round} · {race.date}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="text-lg">{race.flag}</span>
+                {race.location}, {race.country}
+              </span>
             </div>
           </div>
         </div>
@@ -94,7 +130,7 @@ export default function CircuitProfileModal({
           {/* Description */}
           <div>
             <p className="text-sm text-gray-600 leading-relaxed">{race.description}</p>
-            <div className="flex items-center gap-4 mt-3 text-xs text-gray-400 f1-mono flex-wrap">
+            <div className="flex items-center gap-4 mt-3 text-sm text-gray-400 f1-mono flex-wrap">
               {race.circuitType && (
                 <span className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-sm uppercase">{typeLabel}</span>
               )}
@@ -129,7 +165,7 @@ export default function CircuitProfileModal({
                 <div key={label} className="bg-white rounded-sm p-3 border border-gray-100 text-center">
                   <Icon size={14} className="mx-auto mb-1 text-gray-300" />
                   <div className="font-black f1-stat-number text-lg text-[#1A1A2E]">{value}</div>
-                  <div className="text-[10px] text-gray-400 f1-mono">{label}</div>
+                  <div className="text-xs text-gray-400 f1-mono">{label}</div>
                 </div>
               ))}
             </div>
@@ -138,7 +174,7 @@ export default function CircuitProfileModal({
               <div className="mt-2 bg-white rounded-sm p-3 border border-gray-100 flex items-center gap-2">
                 <Timer size={14} className="text-[#E8002D] shrink-0" />
                 <div>
-                  <div className="text-xs text-gray-400 f1-mono">Lap Record</div>
+                  <div className="text-sm text-gray-400 f1-mono">Lap Record</div>
                   <div className="text-sm font-bold f1-mono text-[#1A1A2E]">
                     {race.lapRecord} — {race.lapRecordHolder} ({race.lapRecordYear})
                   </div>
@@ -156,7 +192,7 @@ export default function CircuitProfileModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Past Winners */}
               <div>
-                <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Recent Winners</div>
+                <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">Recent Winners</div>
                 {race.pastWinners && race.pastWinners.length > 0 ? (
                   <div className="space-y-1">
                     {race.pastWinners.map((w: CircuitWinner, i: number) => (
@@ -171,29 +207,29 @@ export default function CircuitProfileModal({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-semibold text-[#1A1A2E] truncate">{w.driver}</div>
-                          <div className="text-xs text-gray-400 f1-mono truncate">{w.team}</div>
+                          <div className="text-sm text-gray-400 f1-mono truncate">{w.team}</div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 f1-mono">No historical data available (new circuit)</p>
+                  <p className="text-sm text-gray-400 f1-mono">No historical data available (new circuit)</p>
                 )}
               </div>
 
               {/* Circuit Facts */}
               <div>
-                <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Circuit Facts</div>
+                <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">Circuit Facts</div>
                 <div className="space-y-2">
                   {race.yearBuilt && (
                     <div className="bg-[#1A1A2E] rounded-sm p-3">
-                      <div className="text-white/40 text-[10px] f1-mono uppercase">Year Built</div>
+                      <div className="text-white/40 text-xs f1-mono uppercase">Year Built</div>
                       <div className="text-white font-black f1-stat-number text-lg">{race.yearBuilt}</div>
                     </div>
                   )}
                   {race.numberOfGrandsPrix !== undefined && (
                     <div className="bg-[#1A1A2E] rounded-sm p-3">
-                      <div className="text-white/40 text-[10px] f1-mono uppercase">Total Grands Prix</div>
+                      <div className="text-white/40 text-xs f1-mono uppercase">Total Grands Prix</div>
                       <div className="text-white font-black f1-stat-number text-lg">{race.numberOfGrandsPrix || "Debut"}</div>
                     </div>
                   )}
@@ -202,7 +238,7 @@ export default function CircuitProfileModal({
                 {race.notableFacts && race.notableFacts.length > 0 && (
                   <div className="mt-3 space-y-1">
                     {race.notableFacts.map((fact, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                      <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
                         <span className="text-[#E8002D] mt-0.5 shrink-0">·</span>
                         <span className="leading-relaxed">{fact}</span>
                       </div>
@@ -224,33 +260,33 @@ export default function CircuitProfileModal({
               {isCompleted ? (
                 <div className="bg-[#1A1A2E] rounded-sm p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-xs f1-mono">Winner</span>
+                    <span className="text-white/60 text-sm f1-mono">Winner</span>
                     <span className="text-yellow-400 font-bold text-sm flex items-center gap-1">
                       <Trophy size={12} /> {race.winner}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-xs f1-mono">Team</span>
+                    <span className="text-white/60 text-sm f1-mono">Team</span>
                     <span className="text-white text-sm">{race.winnerTeam}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-xs f1-mono">Pole Position</span>
+                    <span className="text-white/60 text-sm f1-mono">Pole Position</span>
                     <span className="text-white text-sm">{race.polePosition}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-xs f1-mono">Fastest Lap</span>
+                    <span className="text-white/60 text-sm f1-mono">Fastest Lap</span>
                     <span className="text-[#E8002D] text-sm">{race.fastestLap}</span>
                   </div>
                 </div>
               ) : race.prediction ? (
                 <div className="bg-[#1A1A2E] rounded-sm p-4">
-                  <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Prediction</div>
-                  <p className="text-white/80 text-xs leading-relaxed">{race.prediction}</p>
+                  <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest mb-1">Prediction</div>
+                  <p className="text-white/80 text-sm leading-relaxed">{race.prediction}</p>
                   {race.predictionFavorite && (
                     <div className="mt-3 flex items-center gap-2">
-                      <span className="text-white/40 text-xs f1-mono">Favourite:</span>
+                      <span className="text-white/40 text-sm f1-mono">Favourite:</span>
                       <span className="text-[#E8002D] text-sm font-bold f1-display">{race.predictionFavorite}</span>
-                      {race.predictionOdds && <span className="text-white/40 text-xs f1-mono">({race.predictionOdds})</span>}
+                      {race.predictionOdds && <span className="text-white/40 text-sm f1-mono">({race.predictionOdds})</span>}
                     </div>
                   )}
                 </div>

@@ -26,6 +26,7 @@ const NAV_ITEMS = [
   { id: "drivers", label: "Drivers", icon: Users },
   { id: "constructors", label: "Constructors", icon: Building2 },
   { id: "races", label: "Races", icon: MapPin },
+  { id: "current-race", label: "Current Race", icon: Flag },
   { id: "predictions", label: "Predictions", icon: TrendingUp },
 ];
 
@@ -47,14 +48,14 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           </div>
           <div>
             <div className="text-white font-bold text-sm f1-display tracking-wider">F1 DASH</div>
-            <div className="text-white/40 text-xs f1-mono">2026 SEASON</div>
+            <div className="text-white/40 text-sm f1-mono">2026 SEASON</div>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
-        <div className="mb-2 px-3 text-white/30 text-xs f1-mono uppercase tracking-widest">Navigation</div>
+        <div className="mb-2 px-3 text-white/30 text-[13px] f1-mono uppercase tracking-widest">Navigation</div>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -80,16 +81,16 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         })}
 
         {/* Race Status */}
-        <div className="mt-6 mb-2 px-3 text-white/30 text-xs f1-mono uppercase tracking-widest">Season Progress</div>
+        <div className="mt-6 mb-2 px-3 text-white/30 text-[13px] f1-mono uppercase tracking-widest">Season Progress</div>
         
         {nextRace && (
           <div className="mx-3 mb-3 p-3 bg-[#E8002D]/15 border border-[#E8002D]/30 rounded-sm">
             <div className="flex items-center gap-1.5 mb-1">
               <div className="w-1.5 h-1.5 bg-[#E8002D] rounded-full animate-pulse" />
-              <span className="text-[#E8002D] text-xs f1-mono uppercase tracking-wider">Next Race</span>
+              <span className="text-[#E8002D] text-sm f1-mono uppercase tracking-wider">Next Race</span>
             </div>
             <div className="text-white text-sm font-semibold f1-display">{nextRace.name}</div>
-            <div className="text-white/50 text-xs mt-0.5">{nextRace.date}</div>
+            <div className="text-white/50 text-sm mt-0.5">{nextRace.date}</div>
           </div>
         )}
 
@@ -100,9 +101,9 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
                 <Flag size={8} className="text-green-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-white/70 text-xs truncate">{race.name.replace(" Grand Prix", " GP")}</div>
+                <div className="text-white/70 text-sm truncate">{race.name.replace(" Grand Prix", " GP")}</div>
               </div>
-              <div className="text-white/40 text-xs f1-mono shrink-0">R{race.round}</div>
+              <div className="text-white/40 text-sm f1-mono shrink-0">R{race.round}</div>
             </div>
           ))}
         </div>
@@ -112,11 +113,11 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-white/5 rounded-sm p-2 text-center">
               <div className="text-white f1-stat-number text-xl">{completedRaces.length}</div>
-              <div className="text-white/40 text-xs">Races Done</div>
+              <div className="text-white/40 text-sm">Races Done</div>
             </div>
             <div className="bg-white/5 rounded-sm p-2 text-center">
               <div className="text-white f1-stat-number text-xl">{24 - completedRaces.length}</div>
-              <div className="text-white/40 text-xs">Remaining</div>
+              <div className="text-white/40 text-sm">Remaining</div>
             </div>
           </div>
         </div>
@@ -124,8 +125,8 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-white/10">
-        <div className="text-white/30 text-xs f1-mono">Data current as of</div>
-        <div className="text-white/50 text-xs f1-mono">Round 1 — Australia 2026</div>
+        <div className="text-white/30 text-sm f1-mono">Data current as of</div>
+        <div className="text-white/50 text-sm f1-mono">Round 1 — Australia 2026</div>
       </div>
     </div>
   );

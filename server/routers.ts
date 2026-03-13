@@ -193,6 +193,159 @@ const f1Router = router({
     }
   }),
 
+  /** Sprint results for a specific round */
+  sprintResults: publicProcedure
+    .input(z.object({ round: z.number() }))
+    .query(async ({ input }) => {
+      const CACHE_KEY = `sprintResults_${input.round}`;
+      try {
+        const data = await fetchJolpica(`/${CURRENT_YEAR}/${input.round}/sprint.json`);
+        const race = data?.MRData?.RaceTable?.Races?.[0];
+        if (!race) return await cacheGet(CACHE_KEY);
+        const result = {
+          round: parseInt(race.round),
+          raceName: race.raceName,
+          results: (race.SprintResults ?? []).map((r: any) => ({
+            position: parseInt(r.position),
+            number: r.number,
+            driverId: r.Driver?.driverId,
+            code: r.Driver?.code,
+            givenName: r.Driver?.givenName,
+            familyName: r.Driver?.familyName,
+            team: r.Constructor?.name,
+            constructorId: r.Constructor?.constructorId,
+            grid: parseInt(r.grid),
+            laps: parseInt(r.laps),
+            status: r.status,
+            points: parseFloat(r.points),
+            time: r.Time?.time ?? null,
+          })),
+          updatedAt: new Date().toISOString(),
+        };
+        await cacheSet(CACHE_KEY, result);
+        return result;
+      } catch (err) {
+        console.error("[F1 API] sprintResults error:", err);
+        return await cacheGet(CACHE_KEY);
+      }
+    }),
+
+  /** Practice session lap times from OpenF1 */
+  practiceSessions: publicProcedure
+    .input(z.object({ circuitShortName: z.string() }))
+    .query(async ({ input }) => {
+      const CACHE_KEY = `practice_${input.circuitShortName}`;
+      try {
+        // Get all sessions for this circuit in current year
+        const sessions = await fetchOpenF1(
+          `/sessions?year=${CURRENT_YEAR}&circuit_short_name=${input.circuitShortName}`
+        );
+        if (!sessions?.length) return await cacheGet(CACHE_KEY);
+
+        // Filter to practice sessions only
+        const practiceSessions = sessions.filter((s: any) =>
+          s.session_type === "Practice"
+        );
+
+        // For each practice session, get the fastest lap per driver
+        const sessionResults = await Promise.all(
+          practiceSessions.map(async (session: any) => {
+            try {
+              const laps = await fetchOpenF1(
+                `/laps?session_key=${session.session_key}&is_pit_out_lap=false`
+              );
+
+              // Group by driver, find fastest lap for each
+              const driverBest: Record<number, any> = {};
+              for (const lap of (laps ?? [])) {
+                if (!lap.lap_duration || lap.lap_duration <= 0) continue;
+                const num = lap.driver_number;
+                if (!driverBest[num] || lap.lap_duration < driverBest[num].lap_duration) {
+                  driverBest[num] = lap;
+                }
+              }
+
+              // Sort by fastest time
+              const sorted = Object.values(driverBest)
+                .sort((a: any, b: any) => a.lap_duration - b.lap_duration);
+
+              return {
+                sessionName: session.session_name,
+                sessionKey: session.session_key,
+                dateStart: session.date_start,
+                results: sorted.slice(0, 20).map((lap: any, idx: number) => ({
+                  position: idx + 1,
+                  driverNumber: lap.driver_number,
+                  lapDuration: lap.lap_duration,
+                  sector1: lap.duration_sector_1,
+                  sector2: lap.duration_sector_2,
+                  sector3: lap.duration_sector_3,
+                })),
+              };
+            } catch {
+              return {
+                sessionName: session.session_name,
+                sessionKey: session.session_key,
+                dateStart: session.date_start,
+                results: [],
+              };
+            }
+          })
+        );
+
+        const result = {
+          circuitShortName: input.circuitShortName,
+          sessions: sessionResults,
+          updatedAt: new Date().toISOString(),
+        };
+        await cacheSet(CACHE_KEY, result);
+        return result;
+      } catch (err) {
+        console.error("[F1 API] practiceSessions error:", err);
+        return await cacheGet(CACHE_KEY);
+      }
+    }),
+
+  /** Historical results at a specific circuit (for predictions) */
+  circuitHistory: publicProcedure
+    .input(z.object({ circuitId: z.string() }))
+    .query(async ({ input }) => {
+      const CACHE_KEY = `circuit_${input.circuitId}`;
+      try {
+        // Fetch last 10 years of results at this circuit
+        const data = await fetchJolpica(`/circuits/${input.circuitId}/results.json?limit=200&offset=0`);
+        const races = data?.MRData?.RaceTable?.Races ?? [];
+
+        // Only keep recent years (last 10)
+        const recentRaces = races.filter((r: any) => parseInt(r.season) >= 2016);
+
+        const result = {
+          circuitId: input.circuitId,
+          races: recentRaces.map((race: any) => ({
+            season: race.season,
+            round: race.round,
+            results: (race.Results ?? []).slice(0, 10).map((r: any) => ({
+              position: parseInt(r.position),
+              driverId: r.Driver?.driverId,
+              givenName: r.Driver?.givenName,
+              familyName: r.Driver?.familyName,
+              constructorId: r.Constructor?.constructorId,
+              constructorName: r.Constructor?.name,
+              grid: parseInt(r.grid),
+              points: parseFloat(r.points),
+              status: r.status,
+            })),
+          })),
+          updatedAt: new Date().toISOString(),
+        };
+        await cacheSet(CACHE_KEY, result);
+        return result;
+      } catch (err) {
+        console.error("[F1 API] circuitHistory error:", err);
+        return await cacheGet(CACHE_KEY);
+      }
+    }),
+
   /** Qualifying results for a specific round */
   qualifying: publicProcedure
     .input(z.object({ round: z.number() }))

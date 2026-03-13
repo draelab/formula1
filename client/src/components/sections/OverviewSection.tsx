@@ -1,12 +1,11 @@
 // F1 2026 Dashboard — Overview Section (Live Data)
 // Design: Hero banner + compact stats bar + race result with bar chart
 
-import { DRIVERS_2026, CONSTRUCTORS_2026, RACES_2026, TEAM_COLORS } from "@/lib/f1Data";
+import { DRIVERS_2026, CONSTRUCTORS_2026, RACES_2026, TEAM_COLORS, VENUE_IMAGES } from "@/lib/f1Data";
 import { useDriverStandings, useConstructorStandings, useRaceResults, useSchedule } from "@/hooks/useF1LiveData";
 import { Zap, ChevronRight } from "lucide-react";
 
 const HERO_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310419663031769921/QfooNsf5N2WhwQZYmGVtwY/f1-hero-banner-4qb4fdVTV5aszZb5q6bpPq.webp";
-const COCKPIT_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310419663031769921/QfooNsf5N2WhwQZYmGVtwY/f1-cockpit-view-RT5qP3fSrxVZwiVuYSEQxm.webp";
 
 interface OverviewSectionProps {
   onSectionChange: (section: string) => void;
@@ -94,30 +93,30 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
       {/* Compact Stats Bar */}
       <div className="grid grid-cols-2 md:grid-cols-4 bg-[#1A1A2E] border-b border-white/10">
         <div className="p-4 md:p-5 border-r border-white/10 text-center">
-          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Championship Leader</div>
+          <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest mb-1">Championship Leader</div>
           <div className="text-white font-bold text-sm f1-display">
             {(leader as any).name || `${(leader as any).givenName} ${(leader as any).familyName}`}
           </div>
           <div className="text-[#E8002D] text-sm f1-mono font-bold">{(leader as any).points} PTS</div>
         </div>
         <div className="p-4 md:p-5 border-r border-white/10 text-center">
-          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Constructors Leader</div>
+          <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest mb-1">Constructors Leader</div>
           <div className="text-white font-bold text-sm f1-display">{(constructorLeader as any).name}</div>
           <div className="text-[#E8002D] text-sm f1-mono font-bold">{(constructorLeader as any).points} PTS</div>
         </div>
         <div className="p-4 md:p-5 border-r border-white/10 text-center">
-          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Races Completed</div>
+          <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest mb-1">Races Completed</div>
           <div className="text-white font-bold text-lg f1-display">{completedCount} / 24</div>
-          <div className="text-white/50 text-xs f1-mono">
+          <div className="text-white/50 text-sm f1-mono">
             {lastRace ? ((lastRace as any).raceName || (lastRace as any).name || "").replace(" Grand Prix", "") : "—"}
           </div>
         </div>
         <div className="p-4 md:p-5 text-center">
-          <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-1">Next Race</div>
+          <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest mb-1">Next Race</div>
           <div className="text-white font-bold text-sm f1-display">
             {nextRace ? ((nextRace as any).country || ((nextRace as any).raceName || (nextRace as any).name || "").replace(" Grand Prix", "")) : "—"}
           </div>
-          <div className="text-[#E8002D] text-xs f1-mono">
+          <div className="text-[#E8002D] text-sm f1-mono">
             {nextRace ? (nextRace as any).date : ""}
           </div>
         </div>
@@ -135,13 +134,13 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
           {/* Race Image */}
           <div className="relative h-48 md:h-64 overflow-hidden mb-6">
             <img
-              src={COCKPIT_IMG}
+              src={VENUE_IMAGES[(lastRace as any)?.raceName || (lastRace as any)?.name || ""] || HERO_IMG}
               alt="Race"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 p-4 md:p-6">
-              <div className="text-white/60 text-xs f1-mono mb-1">
+              <div className="text-white/60 text-sm f1-mono mb-1">
                 ROUND {(lastRace as any)?.round || 1} · {((lastRace as any)?.circuitName || (lastRace as any)?.circuit || "Albert Park").toUpperCase()} · {(lastRace as any)?.date || "8 MARCH 2026"}
               </div>
               <div className="f1-display text-white text-xl md:text-2xl font-black uppercase">
@@ -167,7 +166,7 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
                     <div className="font-bold text-sm text-[#1A1A2E]">
                       {result.givenName ? `${result.givenName} ${result.familyName}` : result.name}
                     </div>
-                    <div className="text-xs text-gray-400">{result.team}</div>
+                    <div className="text-sm text-gray-400">{result.team}</div>
                   </div>
                   <div className="text-sm f1-mono font-semibold text-[#1A1A2E]">{result.points} pts</div>
                 </div>
@@ -176,7 +175,7 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
           </div>
 
           {/* Race Footer */}
-          <div className="mt-4 flex items-center justify-between text-xs text-gray-400 f1-mono">
+          <div className="mt-4 flex items-center justify-between text-sm text-gray-400 f1-mono">
             <div>
               {(() => {
                 if (!lastRace || !(lastRace as any).results) return "Pole: G. Russell · Fastest Lap: M. Verstappen";
@@ -206,7 +205,7 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
                   <div key={idx}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-white/50 text-xs f1-mono w-4">{idx + 1}</span>
+                        <span className="text-white/50 text-sm f1-mono w-4">{idx + 1}</span>
                         <span className="text-white font-bold text-sm f1-mono">{getCode(d)}</span>
                         <span className="text-sm">{getFlag(d)}</span>
                       </div>
@@ -230,11 +229,11 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
               <h3 className="f1-display text-white text-lg font-black uppercase mb-3">Next Race</h3>
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <div className="text-white/40 text-xs f1-mono mb-1">ROUND {(nextRace as any).round || 2}</div>
+                  <div className="text-white/40 text-sm f1-mono mb-1">ROUND {(nextRace as any).round || 2}</div>
                   <div className="f1-display text-white text-lg font-black leading-tight">
                     {(nextRace as any).raceName || (nextRace as any).name}
                   </div>
-                  <div className="text-white/50 text-xs f1-mono mt-1">
+                  <div className="text-white/50 text-sm f1-mono mt-1">
                     {(nextRace as any).circuitName || (nextRace as any).circuit}
                   </div>
                 </div>
@@ -245,21 +244,21 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
 
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <div>
-                  <div className="text-white/40 text-xs f1-mono">Date</div>
+                  <div className="text-white/40 text-sm f1-mono">Date</div>
                   <div className="text-white text-sm font-medium">{(nextRace as any).date}</div>
                 </div>
                 <div>
-                  <div className="text-white/40 text-xs f1-mono">Format</div>
+                  <div className="text-white/40 text-sm f1-mono">Format</div>
                   <div className="text-white text-sm font-medium">
                     {(nextRace as any).sprint ? "Sprint Weekend" : "Standard"}
                   </div>
                 </div>
                 <div>
-                  <div className="text-white/40 text-xs f1-mono">Circuit Length</div>
+                  <div className="text-white/40 text-sm f1-mono">Circuit Length</div>
                   <div className="text-white text-sm font-medium">{(nextRace as any).circuitLength || "5.451 km"}</div>
                 </div>
                 <div>
-                  <div className="text-white/40 text-xs f1-mono">Favourite</div>
+                  <div className="text-white/40 text-sm f1-mono">Favourite</div>
                   <div className="text-sm font-medium" style={{ color: "#E8002D" }}>
                     {(leader as any).name || `${(leader as any).givenName} ${(leader as any).familyName}`}
                   </div>
@@ -299,7 +298,7 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-50 px-6 py-3 text-xs text-gray-400 f1-mono flex items-center justify-between border-t border-gray-100">
+      <div className="bg-gray-50 px-6 py-3 text-sm text-gray-400 f1-mono flex items-center justify-between border-t border-gray-100">
         <div>Data current as of<br />Round {completedCount} — {lastRace ? ((lastRace as any).raceName || (lastRace as any).name || "Australia") : "Australia"} {new Date().getFullYear()}</div>
       </div>
     </div>
