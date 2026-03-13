@@ -139,7 +139,7 @@ export default function CircuitProfileModal({
               ))}
             </div>
 
-            {race.lapRecord && race.lapRecord !== "N/A (new circuit)" && (
+            {race.lapRecord && (
               <div className="mt-2 bg-white rounded-sm p-3 border border-gray-100 flex items-center gap-2">
                 <Timer size={14} className="text-[#E8002D] shrink-0" />
                 <div>
