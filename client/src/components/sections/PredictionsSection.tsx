@@ -44,12 +44,12 @@ function getDriverColor(constructorId: string | undefined): string {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#1A1A2E] text-white px-3 py-2 rounded-sm text-xs shadow-lg">
+      <div className="bg-card text-card-foreground px-3 py-2 rounded-sm text-xs shadow-lg">
         <div className="font-bold f1-mono mb-1">{label}</div>
         {payload.map((p: any) => (
           <div key={p.name} className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-            <span className="text-white/70">{p.name}:</span>
+            <span className="text-muted-foreground">{p.name}:</span>
             <span className="font-bold">{p.value} pts</span>
           </div>
         ))}
@@ -332,7 +332,7 @@ export default function PredictionsSection() {
     return (
       <div className="p-6 md:p-8 flex items-center justify-center min-h-[400px]">
         <Loader2 className="animate-spin text-[#E8002D] mr-2" size={20} />
-        <span className="text-gray-500 f1-mono">Loading prediction data...</span>
+        <span className="text-muted-foreground f1-mono">Loading prediction data...</span>
       </div>
     );
   }
@@ -345,13 +345,13 @@ export default function PredictionsSection() {
           <div className="w-1 h-8 bg-[#E8002D]" />
           <div>
             <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">Data Analysis</div>
-            <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Season Predictions</h2>
+            <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">Season Predictions</h2>
           </div>
         </div>
-        <div className="bg-white border border-gray-100 rounded-sm p-8 shadow-sm text-center">
-          <Trophy size={32} className="text-gray-300 mx-auto mb-3" />
-          <p className="text-lg font-semibold text-[#1A1A2E] f1-display">Predictions will be available after Round 1</p>
-          <p className="text-sm text-gray-400 mt-1">Once the first race is completed, predictions will be generated from live standings and results data.</p>
+        <div className="bg-card border border-border rounded-sm p-8 shadow-sm text-center">
+          <Trophy size={32} className="text-muted-foreground mx-auto mb-3" />
+          <p className="text-lg font-semibold text-foreground f1-display">Predictions will be available after Round 1</p>
+          <p className="text-sm text-muted-foreground mt-1">Once the first race is completed, predictions will be generated from live standings and results data.</p>
         </div>
       </div>
     );
@@ -364,41 +364,41 @@ export default function PredictionsSection() {
         <div className="w-1 h-8 bg-[#E8002D]" />
         <div>
           <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">Data Analysis</div>
-          <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Season Predictions</h2>
+          <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">Season Predictions</h2>
         </div>
       </div>
 
       {/* Disclaimer */}
-      <div className="bg-amber-50 border border-amber-200 rounded-sm p-3 mb-6 flex items-start gap-2">
-        <AlertTriangle size={14} className="text-amber-500 mt-0.5 shrink-0" />
-        <p className="text-sm text-amber-700">Predictions are derived from current championship standings, race results, and constructor performance data. They are statistical projections based on form extrapolation, not guarantees.</p>
+      <div className="bg-amber-950/30 border border-amber-800/30 rounded-sm p-3 mb-6 flex items-start gap-2">
+        <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
+        <p className="text-sm text-amber-400">Predictions are derived from current championship standings, race results, and constructor performance data. They are statistical projections based on form extrapolation, not guarantees.</p>
       </div>
 
       {/* Championship Trajectory Chart */}
       {trajectoryData.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-sm p-5 shadow-sm mb-6">
+        <div className="bg-card border border-border rounded-sm p-5 shadow-sm mb-6">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp size={16} className="text-[#E8002D]" />
-            <div className="text-sm font-semibold text-[#1A1A2E] f1-display uppercase tracking-wide">
+            <div className="text-sm font-semibold text-foreground f1-display uppercase tracking-wide">
               Championship Trajectory
             </div>
           </div>
-          <p className="text-xs text-gray-400 f1-mono mb-4 ml-6">
+          <p className="text-xs text-muted-foreground f1-mono mb-4 ml-6">
             Cumulative points for top 6 drivers — solid lines show actual results{projectedData.length > 1 ? ", dashed lines show projected pace" : ""}
           </p>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={trajectoryData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="round" tick={{ fontSize: 13, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 13, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="round" tick={{ fontSize: 13, fontFamily: "IBM Plex Mono", fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 13, fontFamily: "IBM Plex Mono", fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               {/* Reference line separating actual from projected */}
               {projectedData.length > 1 && actualData.length > 0 && (
                 <ReferenceLine
                   x={actualData[actualData.length - 1]?.round}
-                  stroke="#ccc"
+                  stroke="var(--border)"
                   strokeDasharray="4 4"
-                  label={{ value: "Projected →", position: "top", fontSize: 10, fill: "#aaa", fontFamily: "IBM Plex Mono" }}
+                  label={{ value: "Projected →", position: "top", fontSize: 10, fill: "var(--muted-foreground)", fontFamily: "IBM Plex Mono" }}
                 />
               )}
               {/* Driver lines (solid for actual, hollow dots for projected) */}
@@ -421,7 +421,7 @@ export default function PredictionsSection() {
                         const { cx, cy, index } = props;
                         if (index > projectionStartIndex) {
                           // Projected points: hollow circle
-                          return <circle key={`dot-${name}-${index}`} cx={cx} cy={cy} r={isTeamDupe ? 2 : 3} fill="white" stroke={color} strokeWidth={1.5} />;
+                          return <circle key={`dot-${name}-${index}`} cx={cx} cy={cy} r={isTeamDupe ? 2 : 3} fill="var(--background)" stroke={color} strokeWidth={1.5} />;
                         }
                         // Actual points: solid circle
                         return <circle key={`dot-${name}-${index}`} cx={cx} cy={cy} r={isTeamDupe ? 2 : 3} fill={color} />;
@@ -438,13 +438,13 @@ export default function PredictionsSection() {
             {legendEntries.map(({ name, color, dashed }: { name: string; color: string; dashed: boolean }) => (
               <div key={name} className="flex items-center gap-1.5">
                 <div className="w-4 h-0.5 rounded-full" style={{ backgroundColor: color, opacity: dashed ? 0.6 : 1 }} />
-                <span className="text-sm text-gray-500 f1-mono">{name}</span>
+                <span className="text-sm text-muted-foreground f1-mono">{name}</span>
               </div>
             ))}
             {projectedData.length > 1 && (
-              <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-gray-200">
-                <div className="w-2 h-2 rounded-full border border-gray-400 bg-white" />
-                <span className="text-sm text-gray-400 f1-mono">Projected</span>
+              <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-border">
+                <div className="w-2 h-2 rounded-full border border-muted-foreground bg-card" />
+                <span className="text-sm text-muted-foreground f1-mono">Projected</span>
               </div>
             )}
           </div>
@@ -455,7 +455,7 @@ export default function PredictionsSection() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Target size={16} className="text-[#E8002D]" />
-          <div className="text-sm font-semibold text-[#1A1A2E] f1-display uppercase tracking-wide">Upcoming Race Predictions</div>
+          <div className="text-sm font-semibold text-foreground f1-display uppercase tracking-wide">Upcoming Race Predictions</div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {upcomingPredictions.map(({ race, favorite, odds, prediction }) => {
@@ -464,32 +464,32 @@ export default function PredictionsSection() {
               ? (favorite.name ?? `${favorite.givenName ?? ""} ${favorite.familyName ?? ""}`.trim())
               : null;
             return (
-              <div key={race.round} className={`bg-white border rounded-sm p-4 shadow-sm ${race.status === "next" ? "border-[#E8002D]/40" : "border-gray-100"}`}>
+              <div key={race.round} className={`bg-card border rounded-sm p-4 shadow-sm ${race.status === "next" ? "border-[#E8002D]/40" : "border-border"}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest">Round {race.round}</div>
-                    <div className="f1-display text-base font-bold text-[#1A1A2E] leading-tight mt-0.5">
+                    <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest">Round {race.round}</div>
+                    <div className="f1-display text-base font-bold text-foreground leading-tight mt-0.5">
                       {race.name.replace(" Grand Prix", " GP")}
                     </div>
-                    <div className="text-sm text-gray-400 mt-0.5">{race.date}</div>
+                    <div className="text-sm text-muted-foreground mt-0.5">{race.date}</div>
                   </div>
                   <div className="text-2xl">{race.flag}</div>
                 </div>
 
                 {prediction && (
-                  <p className="text-sm text-gray-500 leading-relaxed mb-3">{prediction}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">{prediction}</p>
                 )}
 
                 {favName && (
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-3 border-t border-border">
                     <div>
-                      <div className="text-sm text-gray-400 f1-mono">Predicted Winner</div>
+                      <div className="text-sm text-muted-foreground f1-mono">Predicted Winner</div>
                       <div className="font-bold text-sm f1-display" style={{ color: favColor }}>{favName}</div>
                     </div>
                     {odds && (
-                      <div className="bg-gray-50 rounded-sm px-2 py-1">
-                        <div className="text-sm text-gray-400 f1-mono">Odds</div>
-                        <div className="font-black f1-stat-number text-[#1A1A2E]">{odds}</div>
+                      <div className="bg-muted rounded-sm px-2 py-1">
+                        <div className="text-sm text-muted-foreground f1-mono">Odds</div>
+                        <div className="font-black f1-stat-number text-foreground">{odds}</div>
                       </div>
                     )}
                   </div>
@@ -509,10 +509,10 @@ export default function PredictionsSection() {
       {/* Season Outlook */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Driver Championship Outlook */}
-        <div className="bg-white border border-gray-100 rounded-sm p-5 shadow-sm">
+        <div className="bg-card border border-border rounded-sm p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <Trophy size={16} className="text-[#E8002D]" />
-            <div className="text-sm font-semibold text-[#1A1A2E] f1-display uppercase tracking-wide">Driver Championship Outlook</div>
+            <div className="text-sm font-semibold text-foreground f1-display uppercase tracking-wide">Driver Championship Outlook</div>
           </div>
           <div className="space-y-3">
             {projectedStandings.map((d: { driver: string; team: string; current: number; projected: number; color: string }, i: number) => {
@@ -522,16 +522,16 @@ export default function PredictionsSection() {
                 <div key={d.driver}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-400 f1-mono w-4">{i + 1}</span>
-                      <span className="text-sm font-semibold text-[#1A1A2E]">{d.driver}</span>
-                      <span className="text-sm text-gray-400">{d.team}</span>
+                      <span className="text-sm text-muted-foreground f1-mono w-4">{i + 1}</span>
+                      <span className="text-sm font-semibold text-foreground">{d.driver}</span>
+                      <span className="text-sm text-muted-foreground">{d.team}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-bold f1-mono text-[#1A1A2E]">{d.projected}</span>
-                      <span className="text-sm text-gray-400 ml-1">proj.</span>
+                      <span className="text-sm font-bold f1-mono text-foreground">{d.projected}</span>
+                      <span className="text-sm text-muted-foreground ml-1">proj.</span>
                     </div>
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full"
                       style={{ width: `${pct}%`, backgroundColor: d.color }}
@@ -541,26 +541,26 @@ export default function PredictionsSection() {
               );
             })}
           </div>
-          <p className="text-sm text-gray-400 mt-4 f1-mono">*Projected final points based on current form extrapolation over {TOTAL_RACES} races</p>
+          <p className="text-sm text-muted-foreground mt-4 f1-mono">*Projected final points based on current form extrapolation over {TOTAL_RACES} races</p>
         </div>
 
         {/* Key Storylines */}
-        <div className="bg-white border border-gray-100 rounded-sm p-5 shadow-sm">
+        <div className="bg-card border border-border rounded-sm p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp size={16} className="text-[#E8002D]" />
-            <div className="text-sm font-semibold text-[#1A1A2E] f1-display uppercase tracking-wide">Key Season Storylines</div>
+            <div className="text-sm font-semibold text-foreground f1-display uppercase tracking-wide">Key Season Storylines</div>
           </div>
           <div className="space-y-4">
             {storylines.map(({ title, body, confidence, label }) => (
-              <div key={title} className="pb-3 border-b border-gray-50 last:border-0">
-                <div className="font-semibold text-sm text-[#1A1A2E] mb-1">{title}</div>
-                <p className="text-sm text-gray-500 leading-relaxed mb-2">{body}</p>
+              <div key={title} className="pb-3 border-b border-border last:border-0">
+                <div className="font-semibold text-sm text-foreground mb-1">{title}</div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-2">{body}</p>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
                     <div className="h-full bg-[#E8002D] rounded-full" style={{ width: `${confidence}%` }} />
                   </div>
                   <span className="text-sm text-[#E8002D] font-bold f1-mono">{confidence}%</span>
-                  <span className="text-sm text-gray-400 f1-mono">{label}</span>
+                  <span className="text-sm text-muted-foreground f1-mono">{label}</span>
                 </div>
               </div>
             ))}

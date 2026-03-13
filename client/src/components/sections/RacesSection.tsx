@@ -29,17 +29,17 @@ export default function RacesSection() {
             <div className="w-1 h-8 bg-[#E8002D]" />
             <div>
               <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">2026 Season</div>
-              <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Races</h2>
+              <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">Races</h2>
             </div>
           </div>
-          <p className="text-gray-500 text-sm ml-4 mt-1">24 Grands Prix across 5 continents</p>
+          <p className="text-muted-foreground text-sm ml-4 mt-1">24 Grands Prix across 5 continents</p>
         </div>
-        <div className="flex gap-1 bg-gray-100 rounded-sm p-1">
+        <div className="flex gap-1 bg-muted rounded-sm p-1">
           {(["all", "completed", "upcoming"] as const).map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors f1-mono capitalize ${filter === f ? "bg-[#1A1A2E] text-white" : "text-gray-500 hover:text-gray-700"}`}
+              className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors f1-mono capitalize ${filter === f ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
             >
               {f.toUpperCase()}
             </button>
@@ -75,14 +75,14 @@ export default function RacesSection() {
             <div
               key={race.round}
               className={cn(
-                "bg-white border rounded-sm overflow-hidden shadow-sm transition-all duration-200",
-                isNext ? "border-[#E8002D]/40 shadow-md" : "border-gray-100",
+                "bg-card border rounded-sm overflow-hidden shadow-sm transition-all duration-200",
+                isNext ? "border-[#E8002D]/40 shadow-md" : "border-border",
                 isCompleted ? "opacity-90" : ""
               )}
             >
               {/* Race Row */}
               <div
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => {
                   setSelectedRace(race);
                   setModalOpen(true);
@@ -93,7 +93,7 @@ export default function RacesSection() {
                   "w-8 h-8 flex items-center justify-center text-sm font-black f1-display shrink-0 rounded-sm",
                   isCompleted ? "bg-green-500 text-white" :
                   isNext ? "bg-[#E8002D] text-white" :
-                  "bg-gray-100 text-gray-500"
+                  "bg-muted text-muted-foreground"
                 )}>
                   {race.round}
                 </div>
@@ -105,7 +105,7 @@ export default function RacesSection() {
                   ) : isNext ? (
                     <div className="w-2 h-2 bg-[#E8002D] rounded-full animate-pulse" />
                   ) : (
-                    <Clock size={14} className="text-gray-300" />
+                    <Clock size={14} className="text-muted-foreground" />
                   )}
                 </div>
 
@@ -115,7 +115,7 @@ export default function RacesSection() {
                 {/* Race Name */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-[#1A1A2E] truncate">{race.name}</span>
+                    <span className="font-semibold text-sm text-foreground truncate">{race.name}</span>
                     {race.isSprint && (
                       <span className="bg-yellow-100 text-yellow-700 text-xs px-1.5 py-0.5 rounded-sm f1-mono font-medium flex items-center gap-1 shrink-0">
                         <Zap size={10} /> SPRINT
@@ -127,12 +127,12 @@ export default function RacesSection() {
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-gray-400 f1-mono">{race.circuit}</div>
+                  <div className="text-sm text-muted-foreground f1-mono">{race.circuit}</div>
                 </div>
 
                 {/* Date */}
                 <div className="text-right shrink-0 hidden sm:block">
-                  <div className="text-sm text-gray-600 f1-mono">{race.date}</div>
+                  <div className="text-sm text-muted-foreground f1-mono">{race.date}</div>
                   {isCompleted && race.winner && (
                     <div className="text-sm text-green-600 font-medium">🏆 {race.winner}</div>
                   )}

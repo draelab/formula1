@@ -35,7 +35,7 @@ export default function CircuitProfileModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-6xl max-h-[85vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
+        className="sm:max-w-6xl max-h-[85vh] overflow-y-auto p-0 gap-0 bg-background border-0"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{race?.name ?? "Circuit"} — Circuit Profile</DialogTitle>
@@ -65,7 +65,7 @@ export default function CircuitProfileModal({
         {!race ? null : (<>
 
         {/* Header band */}
-        <div className="relative overflow-hidden bg-[#1A1A2E]">
+        <div className="relative overflow-hidden bg-card">
           {/* Close button */}
           <button
             onClick={() => onOpenChange(false)}
@@ -129,10 +129,10 @@ export default function CircuitProfileModal({
 
           {/* Description */}
           <div>
-            <p className="text-sm text-gray-600 leading-relaxed">{race.description}</p>
-            <div className="flex items-center gap-4 mt-3 text-sm text-gray-400 f1-mono flex-wrap">
+            <p className="text-sm text-muted-foreground leading-relaxed">{race.description}</p>
+            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground f1-mono flex-wrap">
               {race.circuitType && (
-                <span className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-sm uppercase">{typeLabel}</span>
+                <span className="bg-muted text-muted-foreground px-2 py-0.5 rounded-sm uppercase">{typeLabel}</span>
               )}
               {race.altitude !== undefined && (
                 <span className="flex items-center gap-1">
@@ -149,7 +149,7 @@ export default function CircuitProfileModal({
 
           {/* Circuit Stats */}
           <div>
-            <h3 className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide mb-3 flex items-center gap-2">
+            <h3 className="f1-display text-sm font-black text-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
               <span className="w-1 h-4 bg-[#E8002D] inline-block" />
               Circuit Statistics
             </h3>
@@ -162,20 +162,20 @@ export default function CircuitProfileModal({
                 { label: "DRS ZONES", value: race.drsZones || "—", icon: Zap },
                 { label: "ALTITUDE", value: race.altitude !== undefined ? `${race.altitude}m` : "—", icon: Mountain },
               ].map(({ label, value, icon: Icon }) => (
-                <div key={label} className="bg-white rounded-sm p-3 border border-gray-100 text-center">
-                  <Icon size={14} className="mx-auto mb-1 text-gray-300" />
-                  <div className="font-black f1-stat-number text-lg text-[#1A1A2E]">{value}</div>
-                  <div className="text-xs text-gray-400 f1-mono">{label}</div>
+                <div key={label} className="bg-card rounded-sm p-3 border border-border text-center">
+                  <Icon size={14} className="mx-auto mb-1 text-muted-foreground" />
+                  <div className="font-black f1-stat-number text-lg text-foreground">{value}</div>
+                  <div className="text-xs text-muted-foreground f1-mono">{label}</div>
                 </div>
               ))}
             </div>
 
             {race.lapRecord && (
-              <div className="mt-2 bg-white rounded-sm p-3 border border-gray-100 flex items-center gap-2">
+              <div className="mt-2 bg-card rounded-sm p-3 border border-border flex items-center gap-2">
                 <Timer size={14} className="text-[#E8002D] shrink-0" />
                 <div>
-                  <div className="text-sm text-gray-400 f1-mono">Lap Record</div>
-                  <div className="text-sm font-bold f1-mono text-[#1A1A2E]">
+                  <div className="text-sm text-muted-foreground f1-mono">Lap Record</div>
+                  <div className="text-sm font-bold f1-mono text-foreground">
                     {race.lapRecord} — {race.lapRecordHolder} ({race.lapRecordYear})
                   </div>
                 </div>
@@ -185,52 +185,52 @@ export default function CircuitProfileModal({
 
           {/* Track History */}
           <div>
-            <h3 className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide mb-3 flex items-center gap-2">
+            <h3 className="f1-display text-sm font-black text-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
               <span className="w-1 h-4 bg-[#E8002D] inline-block" />
               Track History
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Past Winners */}
               <div>
-                <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">Recent Winners</div>
+                <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest mb-2">Recent Winners</div>
                 {race.pastWinners && race.pastWinners.length > 0 ? (
                   <div className="space-y-1">
                     {race.pastWinners.map((w: CircuitWinner, i: number) => (
-                      <div key={w.year} className="flex items-center gap-2 bg-white rounded-sm p-2 border border-gray-100">
+                      <div key={w.year} className="flex items-center gap-2 bg-card rounded-sm p-2 border border-border">
                         <div className={`w-6 h-6 flex items-center justify-center text-xs font-bold f1-mono rounded-sm ${
                           i === 0 ? "bg-yellow-400 text-[#1A1A2E]" :
-                          i === 1 ? "bg-gray-300 text-[#1A1A2E]" :
+                          i === 1 ? "bg-muted text-foreground" :
                           i === 2 ? "bg-amber-600 text-white" :
-                          "bg-gray-100 text-gray-500"
+                          "bg-muted text-muted-foreground"
                         }`}>
                           {w.year.toString().slice(-2)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-[#1A1A2E] truncate">{w.driver}</div>
-                          <div className="text-sm text-gray-400 f1-mono truncate">{w.team}</div>
+                          <div className="text-sm font-semibold text-foreground truncate">{w.driver}</div>
+                          <div className="text-sm text-muted-foreground f1-mono truncate">{w.team}</div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-400 f1-mono">No historical data available (new circuit)</p>
+                  <p className="text-sm text-muted-foreground f1-mono">No historical data available (new circuit)</p>
                 )}
               </div>
 
               {/* Circuit Facts */}
               <div>
-                <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">Circuit Facts</div>
+                <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest mb-2">Circuit Facts</div>
                 <div className="space-y-2">
                   {race.yearBuilt && (
-                    <div className="bg-[#1A1A2E] rounded-sm p-3">
-                      <div className="text-white/40 text-xs f1-mono uppercase">Year Built</div>
-                      <div className="text-white font-black f1-stat-number text-lg">{race.yearBuilt}</div>
+                    <div className="bg-card rounded-sm p-3">
+                      <div className="text-muted-foreground text-xs f1-mono uppercase">Year Built</div>
+                      <div className="text-card-foreground font-black f1-stat-number text-lg">{race.yearBuilt}</div>
                     </div>
                   )}
                   {race.numberOfGrandsPrix !== undefined && (
-                    <div className="bg-[#1A1A2E] rounded-sm p-3">
-                      <div className="text-white/40 text-xs f1-mono uppercase">Total Grands Prix</div>
-                      <div className="text-white font-black f1-stat-number text-lg">{race.numberOfGrandsPrix || "Debut"}</div>
+                    <div className="bg-card rounded-sm p-3">
+                      <div className="text-muted-foreground text-xs f1-mono uppercase">Total Grands Prix</div>
+                      <div className="text-card-foreground font-black f1-stat-number text-lg">{race.numberOfGrandsPrix || "Debut"}</div>
                     </div>
                   )}
                 </div>
@@ -238,7 +238,7 @@ export default function CircuitProfileModal({
                 {race.notableFacts && race.notableFacts.length > 0 && (
                   <div className="mt-3 space-y-1">
                     {race.notableFacts.map((fact, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                      <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <span className="text-[#E8002D] mt-0.5 shrink-0">·</span>
                         <span className="leading-relaxed">{fact}</span>
                       </div>
@@ -252,41 +252,41 @@ export default function CircuitProfileModal({
           {/* Race Result or Prediction */}
           {(isCompleted || race.prediction) && (
             <div>
-              <h3 className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <h3 className="f1-display text-sm font-black text-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
                 <span className="w-1 h-4 bg-[#E8002D] inline-block" />
                 {isCompleted ? "Race Result" : isNext ? "Race Preview" : "Prediction"}
               </h3>
 
               {isCompleted ? (
-                <div className="bg-[#1A1A2E] rounded-sm p-4 space-y-2">
+                <div className="bg-card rounded-sm p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-sm f1-mono">Winner</span>
+                    <span className="text-muted-foreground text-sm f1-mono">Winner</span>
                     <span className="text-yellow-400 font-bold text-sm flex items-center gap-1">
                       <Trophy size={12} /> {race.winner}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-sm f1-mono">Team</span>
-                    <span className="text-white text-sm">{race.winnerTeam}</span>
+                    <span className="text-muted-foreground text-sm f1-mono">Team</span>
+                    <span className="text-card-foreground text-sm">{race.winnerTeam}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-sm f1-mono">Pole Position</span>
-                    <span className="text-white text-sm">{race.polePosition}</span>
+                    <span className="text-muted-foreground text-sm f1-mono">Pole Position</span>
+                    <span className="text-card-foreground text-sm">{race.polePosition}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-sm f1-mono">Fastest Lap</span>
+                    <span className="text-muted-foreground text-sm f1-mono">Fastest Lap</span>
                     <span className="text-[#E8002D] text-sm">{race.fastestLap}</span>
                   </div>
                 </div>
               ) : race.prediction ? (
-                <div className="bg-[#1A1A2E] rounded-sm p-4">
-                  <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest mb-1">Prediction</div>
-                  <p className="text-white/80 text-sm leading-relaxed">{race.prediction}</p>
+                <div className="bg-card rounded-sm p-4">
+                  <div className="text-muted-foreground text-[13px] f1-mono uppercase tracking-widest mb-1">Prediction</div>
+                  <p className="text-card-foreground text-sm leading-relaxed">{race.prediction}</p>
                   {race.predictionFavorite && (
                     <div className="mt-3 flex items-center gap-2">
-                      <span className="text-white/40 text-sm f1-mono">Favourite:</span>
+                      <span className="text-muted-foreground text-sm f1-mono">Favourite:</span>
                       <span className="text-[#E8002D] text-sm font-bold f1-display">{race.predictionFavorite}</span>
-                      {race.predictionOdds && <span className="text-white/40 text-sm f1-mono">({race.predictionOdds})</span>}
+                      {race.predictionOdds && <span className="text-muted-foreground text-sm f1-mono">({race.predictionOdds})</span>}
                     </div>
                   )}
                 </div>

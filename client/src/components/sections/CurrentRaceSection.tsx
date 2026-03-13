@@ -203,12 +203,12 @@ export default function CurrentRaceSection() {
             <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">
               2026 Season
             </div>
-            <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">
+            <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">
               Current Race Weekend
             </h2>
           </div>
         </div>
-        <div className="flex items-center justify-center h-64 text-gray-400 f1-mono">
+        <div className="flex items-center justify-center h-64 text-muted-foreground f1-mono">
           Loading race weekend data...
         </div>
       </div>
@@ -224,7 +224,7 @@ export default function CurrentRaceSection() {
           <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">
             2026 Season
           </div>
-          <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">
+          <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">
             Current Race Weekend
           </h2>
         </div>
@@ -266,7 +266,7 @@ export default function CurrentRaceSection() {
       </div>
 
       {/* Session selector tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-sm p-1 mb-6 overflow-x-auto">
+      <div className="flex gap-1 bg-muted rounded-sm p-1 mb-6 overflow-x-auto">
         {availableTabs.map((tab) => {
           const hasData =
             (tab === "Race" && raceResult?.results?.length) ||
@@ -287,8 +287,8 @@ export default function CurrentRaceSection() {
               className={cn(
                 "px-3 md:px-4 py-2 text-sm font-medium rounded-sm transition-colors f1-mono whitespace-nowrap relative",
                 effectiveTab === tab
-                  ? "bg-[#1A1A2E] text-white"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {tab}
@@ -306,7 +306,7 @@ export default function CurrentRaceSection() {
       </div>
 
       {/* Session results */}
-      <div className="bg-white border border-gray-100 rounded-sm shadow-sm overflow-hidden mb-6">
+      <div className="bg-card border border-border rounded-sm shadow-sm overflow-hidden mb-6">
         {effectiveTab === "Race" && (
           <RaceResultsTable result={raceResult} isLoading={resultsLoading} />
         )}
@@ -348,14 +348,14 @@ function RaceResultsTable({
 }) {
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         Loading race results...
       </div>
     );
   }
   if (!result?.results?.length) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         No race results available yet
       </div>
     );
@@ -364,20 +364,20 @@ function RaceResultsTable({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-100 bg-gray-50/50">
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 w-12">
+          <tr className="border-b border-border bg-muted/50">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground w-12">
               Pos
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Driver
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 hidden sm:table-cell">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden sm:table-cell">
               Team
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Status
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 w-16">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground w-16">
               Pts
             </th>
           </tr>
@@ -391,7 +391,7 @@ function RaceResultsTable({
             return (
               <tr
                 key={idx}
-                className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
+                className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
               >
                 <td className="px-4 py-2.5">
                   <div className="flex items-center gap-2">
@@ -399,28 +399,28 @@ function RaceResultsTable({
                       className="w-0.5 h-5 rounded-full"
                       style={{ backgroundColor: teamColor }}
                     />
-                    <span className="f1-display font-black text-[#1A1A2E]">
+                    <span className="f1-display font-black text-foreground">
                       {r.position}
                     </span>
                   </div>
                 </td>
                 <td className="px-4 py-2.5">
-                  <span className="font-semibold text-[#1A1A2E]">
+                  <span className="font-semibold text-foreground">
                     {r.givenName} {r.familyName}
                   </span>
-                  <span className="text-gray-400 f1-mono text-xs ml-2">
+                  <span className="text-muted-foreground f1-mono text-xs ml-2">
                     {r.code}
                   </span>
                 </td>
-                <td className="px-4 py-2.5 text-gray-500 text-sm hidden sm:table-cell">
+                <td className="px-4 py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
                   {teamName}
                 </td>
-                <td className="px-4 py-2.5 f1-mono text-sm text-gray-600">
+                <td className="px-4 py-2.5 f1-mono text-sm text-muted-foreground">
                   {r.status === "Finished"
                     ? r.fastestLap?.time ?? "Finished"
                     : r.status}
                 </td>
-                <td className="text-right px-4 py-2.5 f1-mono font-bold text-[#1A1A2E]">
+                <td className="text-right px-4 py-2.5 f1-mono font-bold text-foreground">
                   {r.points > 0 ? r.points : ""}
                 </td>
               </tr>
@@ -442,14 +442,14 @@ function QualifyingTable({
 }) {
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         Loading qualifying results...
       </div>
     );
   }
   if (!qualifying?.results?.length) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         No qualifying data available yet
       </div>
     );
@@ -458,23 +458,23 @@ function QualifyingTable({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-100 bg-gray-50/50">
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 w-12">
+          <tr className="border-b border-border bg-muted/50">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground w-12">
               Pos
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Driver
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 hidden sm:table-cell">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden sm:table-cell">
               Team
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Q1
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Q2
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Q3
             </th>
           </tr>
@@ -483,29 +483,29 @@ function QualifyingTable({
           {qualifying.results.map((r: any, idx: number) => (
             <tr
               key={idx}
-              className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
+              className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
             >
-              <td className="px-4 py-2.5 f1-display font-black text-[#1A1A2E]">
+              <td className="px-4 py-2.5 f1-display font-black text-foreground">
                 {r.position}
               </td>
               <td className="px-4 py-2.5">
-                <span className="font-semibold text-[#1A1A2E]">
+                <span className="font-semibold text-foreground">
                   {r.givenName} {r.familyName}
                 </span>
-                <span className="text-gray-400 f1-mono text-xs ml-2">
+                <span className="text-muted-foreground f1-mono text-xs ml-2">
                   {r.code}
                 </span>
               </td>
-              <td className="px-4 py-2.5 text-gray-500 text-sm hidden sm:table-cell">
+              <td className="px-4 py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
                 {r.team}
               </td>
-              <td className="text-right px-4 py-2.5 f1-mono text-sm text-gray-600">
+              <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground">
                 {r.q1 ?? "-"}
               </td>
-              <td className="text-right px-4 py-2.5 f1-mono text-sm text-gray-600">
+              <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground">
                 {r.q2 ?? "-"}
               </td>
-              <td className="text-right px-4 py-2.5 f1-mono text-sm font-bold text-[#1A1A2E]">
+              <td className="text-right px-4 py-2.5 f1-mono text-sm font-bold text-foreground">
                 {r.q3 ?? "-"}
               </td>
             </tr>
@@ -526,14 +526,14 @@ function SprintResultsTable({
 }) {
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         Loading sprint results...
       </div>
     );
   }
   if (!sprint?.results?.length) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         No sprint results available yet
       </div>
     );
@@ -542,20 +542,20 @@ function SprintResultsTable({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-100 bg-gray-50/50">
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 w-12">
+          <tr className="border-b border-border bg-muted/50">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground w-12">
               Pos
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Driver
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 hidden sm:table-cell">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden sm:table-cell">
               Team
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Time/Status
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 w-16">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground w-16">
               Pts
             </th>
           </tr>
@@ -569,7 +569,7 @@ function SprintResultsTable({
             return (
               <tr
                 key={idx}
-                className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
+                className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
               >
                 <td className="px-4 py-2.5">
                   <div className="flex items-center gap-2">
@@ -577,26 +577,26 @@ function SprintResultsTable({
                       className="w-0.5 h-5 rounded-full"
                       style={{ backgroundColor: teamColor }}
                     />
-                    <span className="f1-display font-black text-[#1A1A2E]">
+                    <span className="f1-display font-black text-foreground">
                       {r.position}
                     </span>
                   </div>
                 </td>
                 <td className="px-4 py-2.5">
-                  <span className="font-semibold text-[#1A1A2E]">
+                  <span className="font-semibold text-foreground">
                     {r.givenName} {r.familyName}
                   </span>
-                  <span className="text-gray-400 f1-mono text-xs ml-2">
+                  <span className="text-muted-foreground f1-mono text-xs ml-2">
                     {r.code}
                   </span>
                 </td>
-                <td className="px-4 py-2.5 text-gray-500 text-sm hidden sm:table-cell">
+                <td className="px-4 py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
                   {teamName}
                 </td>
-                <td className="px-4 py-2.5 f1-mono text-sm text-gray-600">
+                <td className="px-4 py-2.5 f1-mono text-sm text-muted-foreground">
                   {r.time ?? r.status}
                 </td>
-                <td className="text-right px-4 py-2.5 f1-mono font-bold text-[#1A1A2E]">
+                <td className="text-right px-4 py-2.5 f1-mono font-bold text-foreground">
                   {r.points > 0 ? r.points : ""}
                 </td>
               </tr>
@@ -622,7 +622,7 @@ function PracticeTable({
 }) {
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         Loading practice data...
       </div>
     );
@@ -634,7 +634,7 @@ function PracticeTable({
 
   if (!session?.results?.length) {
     return (
-      <div className="p-8 text-center text-gray-400 f1-mono text-sm">
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
         No session data available yet
       </div>
     );
@@ -644,23 +644,23 @@ function PracticeTable({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-100 bg-gray-50/50">
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 w-12">
+          <tr className="border-b border-border bg-muted/50">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground w-12">
               Pos
             </th>
-            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Driver
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Best Lap
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 hidden md:table-cell">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
               S1
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 hidden md:table-cell">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
               S2
             </th>
-            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-gray-400 hidden md:table-cell">
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
               S3
             </th>
           </tr>
@@ -675,44 +675,44 @@ function PracticeTable({
             return (
               <tr
                 key={idx}
-                className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
+                className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
               >
-                <td className="px-4 py-2.5 f1-display font-black text-[#1A1A2E]">
+                <td className="px-4 py-2.5 f1-display font-black text-foreground">
                   {r.position}
                 </td>
                 <td className="px-4 py-2.5">
                   {driver ? (
                     <>
-                      <span className="font-semibold text-[#1A1A2E]">
+                      <span className="font-semibold text-foreground">
                         {driver.name}
                       </span>
-                      <span className="text-gray-400 f1-mono text-xs ml-2">
+                      <span className="text-muted-foreground f1-mono text-xs ml-2">
                         {driver.code}
                       </span>
                     </>
                   ) : (
-                    <span className="f1-mono text-gray-600">
+                    <span className="f1-mono text-muted-foreground">
                       #{r.driverNumber}
                     </span>
                   )}
                 </td>
                 <td className="text-right px-4 py-2.5">
-                  <span className="f1-mono text-sm font-bold text-[#1A1A2E]">
+                  <span className="f1-mono text-sm font-bold text-foreground">
                     {formatLapTime(r.lapDuration)}
                   </span>
                   {gap !== null && (
-                    <span className="text-gray-400 f1-mono text-xs ml-2">
+                    <span className="text-muted-foreground f1-mono text-xs ml-2">
                       +{gap.toFixed(3)}
                     </span>
                   )}
                 </td>
-                <td className="text-right px-4 py-2.5 f1-mono text-sm text-gray-500 hidden md:table-cell">
+                <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground hidden md:table-cell">
                   {r.sector1 ? r.sector1.toFixed(3) : "-"}
                 </td>
-                <td className="text-right px-4 py-2.5 f1-mono text-sm text-gray-500 hidden md:table-cell">
+                <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground hidden md:table-cell">
                   {r.sector2 ? r.sector2.toFixed(3) : "-"}
                 </td>
-                <td className="text-right px-4 py-2.5 f1-mono text-sm text-gray-500 hidden md:table-cell">
+                <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground hidden md:table-cell">
                   {r.sector3 ? r.sector3.toFixed(3) : "-"}
                 </td>
               </tr>
@@ -776,8 +776,8 @@ function WeekendSchedule({
   }, [isSprint, qualifying, sprint, raceResult, practice]);
 
   return (
-    <div className="bg-[#1A1A2E] rounded-sm p-5">
-      <h4 className="f1-mono text-[11px] uppercase tracking-widest text-white/50 mb-3">
+    <div className="bg-card rounded-sm p-5">
+      <h4 className="f1-mono text-[11px] uppercase tracking-widest text-muted-foreground mb-3">
         Weekend Schedule
       </h4>
       <div className="flex flex-wrap gap-3">
@@ -788,13 +788,13 @@ function WeekendSchedule({
               "flex items-center gap-2 px-3 py-2 rounded-sm text-sm f1-mono",
               s.completed
                 ? "bg-green-500/10 text-green-400"
-                : "bg-white/5 text-white/60"
+                : "bg-muted/50 text-muted-foreground"
             )}
           >
             {s.completed ? (
               <Trophy size={12} className="text-green-400" />
             ) : (
-              <Clock size={12} className="text-white/30" />
+              <Clock size={12} className="text-muted-foreground" />
             )}
             <span className="font-medium">{s.name}</span>
             <span className="text-xs opacity-50">{s.time}</span>

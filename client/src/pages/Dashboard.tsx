@@ -57,7 +57,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F8F7F4]">
+    <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
       <Sidebar activeSection={activeSection} onSectionChange={(s) => {
         setTeamContext(undefined);

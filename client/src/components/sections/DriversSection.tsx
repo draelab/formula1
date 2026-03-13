@@ -39,9 +39,9 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
     if (active && payload && payload.length) {
       const d = payload[0].payload;
       return (
-        <div className="bg-[#1A1A2E] text-white px-3 py-2 rounded-sm text-xs shadow-lg">
+        <div className="bg-card text-card-foreground px-3 py-2 rounded-sm text-xs shadow-lg">
           <div className="font-bold f1-display">{d.name}</div>
-          <div className="text-white/60">{d.team}</div>
+          <div className="text-muted-foreground">{d.team}</div>
           <div className="text-[#E8002D] font-bold f1-mono">{d.points} pts</div>
         </div>
       );
@@ -58,24 +58,24 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
             <div className="w-1 h-8 bg-[#E8002D]" />
             <div>
               <div className="text-[#E8002D] text-[13px] f1-mono uppercase tracking-widest">2026 Season</div>
-              <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Drivers</h2>
+              <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">Drivers</h2>
             </div>
           </div>
           <div className="flex items-center gap-3 ml-4 mt-1">
-            <p className="text-gray-500 text-sm">After Round {round}</p>
+            <p className="text-muted-foreground text-sm">After Round {round}</p>
             <DataFreshnessBadge isLive={isLive} updatedAt={updatedAt} isLoading={isLoading} />
           </div>
         </div>
-        <div className="flex gap-1 bg-gray-100 rounded-sm p-1">
+        <div className="flex gap-1 bg-muted rounded-sm p-1">
           <button
             onClick={() => setView("table")}
-            className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors f1-mono ${view === "table" ? "bg-[#1A1A2E] text-white" : "text-gray-500 hover:text-gray-700"}`}
+            className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors f1-mono ${view === "table" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
           >
             TABLE
           </button>
           <button
             onClick={() => setView("chart")}
-            className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors f1-mono ${view === "chart" ? "bg-[#1A1A2E] text-white" : "text-gray-500 hover:text-gray-700"}`}
+            className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors f1-mono ${view === "chart" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
           >
             CHART
           </button>
@@ -87,9 +87,9 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
 
       {/* Table View */}
       {!isLoading && view === "table" && (
-        <div className="bg-white border border-gray-100 rounded-sm shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-sm shadow-sm overflow-hidden">
           {/* Table header */}
-          <div className="grid grid-cols-[40px_44px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-2 bg-[#1A1A2E] text-white/50 text-[13px] f1-mono uppercase tracking-widest">
+          <div className="grid grid-cols-[40px_44px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-2 bg-muted text-muted-foreground text-[13px] f1-mono uppercase tracking-widest">
             <div>POS</div>
             <div></div>
             <div>DRIVER</div>
@@ -107,24 +107,24 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
             const pos = driver.position;
 
             return (
-              <div key={driver.name || driver.driverId} className="border-b border-gray-50 last:border-0">
+              <div key={driver.name || driver.driverId} className="border-b border-border last:border-0">
                 <div
-                  className="grid grid-cols-[40px_44px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-3 items-center cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  className="grid grid-cols-[40px_44px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-3 items-center cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => handleDriverClick(driver)}
                 >
                   {/* Position */}
-                  <div className={`w-8 h-8 flex items-center justify-center text-sm font-black f1-display rounded-sm ${pos === 1 ? "bg-yellow-400 text-[#1A1A2E]" : pos === 2 ? "bg-gray-300 text-[#1A1A2E]" : pos === 3 ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-500"}`}>
+                  <div className={`w-8 h-8 flex items-center justify-center text-sm font-black f1-display rounded-sm ${pos === 1 ? "bg-yellow-400 text-foreground" : pos === 2 ? "bg-gray-300 text-foreground" : pos === 3 ? "bg-amber-600 text-white" : "bg-muted text-muted-foreground"}`}>
                     {pos}
                   </div>
 
                   {/* Driver headshot */}
                   <div className="flex items-center justify-center">
                     <div
-                      className="w-10 h-10 rounded-full overflow-hidden border-2 bg-gray-100 flex-shrink-0"
+                      className="w-10 h-10 rounded-full overflow-hidden border-2 bg-muted flex-shrink-0"
                       style={{ borderColor: teamColor }}
                     >
                       {failedHeadshots.has(driver.shortName) ? (
-                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-400 f1-mono">
+                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-muted-foreground f1-mono">
                           {driver.shortName}
                         </div>
                       ) : (
@@ -140,10 +140,10 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
 
                   {/* Driver name */}
                   <div>
-                    <div className="font-semibold text-sm text-[#1A1A2E]">
+                    <div className="font-semibold text-sm text-foreground">
                       {driver.name || `${driver.givenName} ${driver.familyName}`}
                     </div>
-                    <div className="text-sm text-gray-400 f1-mono">#{driver.number}</div>
+                    <div className="text-sm text-muted-foreground f1-mono">#{driver.number}</div>
                   </div>
 
                   {/* Team */}
@@ -155,14 +155,14 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
                   <div className="text-base hidden sm:block text-center">{driver.flag}</div>
 
                   {/* Australia result */}
-                  <div className="text-sm text-gray-500 f1-mono text-center hidden md:block">
+                  <div className="text-sm text-muted-foreground f1-mono text-center hidden md:block">
                     {driver.australiaResult ?? (driver.position <= 10 ? `P${driver.position}` : "—")}
                   </div>
 
                   {/* Points bar */}
                   <div className="hidden md:block">
                     {driver.points > 0 && (
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden w-16">
+                      <div className="h-1.5 bg-muted rounded-full overflow-hidden w-16">
                         <div
                           className="h-full rounded-full"
                           style={{ width: `${(driver.points / maxPoints) * 100}%`, backgroundColor: teamColor }}
@@ -173,13 +173,13 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
 
                   {/* Points */}
                   <div className="text-right">
-                    <span className="font-black f1-stat-number text-[#1A1A2E]">{driver.points}</span>
-                    <span className="text-sm text-gray-400 ml-1">pts</span>
+                    <span className="font-black f1-stat-number text-foreground">{driver.points}</span>
+                    <span className="text-sm text-muted-foreground ml-1">pts</span>
                   </div>
 
                   {/* Arrow */}
                   <div className="flex justify-end">
-                    <ChevronRight size={12} className="text-gray-300" />
+                    <ChevronRight size={12} className="text-muted-foreground" />
                   </div>
                 </div>
               </div>
@@ -190,8 +190,8 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
 
       {/* Chart View */}
       {!isLoading && view === "chart" && (
-        <div className="bg-white border border-gray-100 rounded-sm p-5 shadow-sm">
-          <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-4">Championship Points — All Drivers</div>
+        <div className="bg-card border border-border rounded-sm p-5 shadow-sm">
+          <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest mb-4">Championship Points — All Drivers</div>
           <ResponsiveContainer width="100%" height={380}>
             <BarChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
               <XAxis dataKey="name" tick={{ fontSize: 12, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />

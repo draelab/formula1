@@ -93,7 +93,7 @@ export default function ConstructorProfileModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
+        className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-background border-0"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{teamName} — Constructor Profile</DialogTitle>
@@ -190,8 +190,8 @@ export default function ConstructorProfileModal({
                   P{constructorData?.position}
                 </div>
                 <div>
-                  <div className="f1-display text-2xl font-black uppercase text-[#1A1A2E]">{teamName}</div>
-                  <div className="text-sm text-gray-500 f1-mono">{constructorData?.chassis} · {constructorData?.powerUnit}</div>
+                  <div className="f1-display text-2xl font-black uppercase text-foreground">{teamName}</div>
+                  <div className="text-sm text-muted-foreground f1-mono">{constructorData?.chassis} · {constructorData?.powerUnit}</div>
                 </div>
               </div>
 
@@ -204,7 +204,7 @@ export default function ConstructorProfileModal({
               {carSpec?.keyFeatures && carSpec.keyFeatures.length > 0 && (
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
                   {carSpec.keyFeatures.map((feat, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                    <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: teamColor }} />
                       <span className="leading-relaxed">{feat}</span>
                     </div>
@@ -215,10 +215,10 @@ export default function ConstructorProfileModal({
 
             {/* Right column — 2026 Drivers */}
             <div>
-              <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">2026 Drivers</div>
+              <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest mb-2">2026 Drivers</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {teamDrivers.map((driver) => (
-                  <div key={driver.number} className="bg-white border border-gray-100 rounded-sm p-3">
+                  <div key={driver.number} className="bg-card border border-border rounded-sm p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <div
                         className="w-8 h-8 rounded-sm flex items-center justify-center font-black f1-stat-number text-sm"
@@ -227,8 +227,8 @@ export default function ConstructorProfileModal({
                         {driver.number}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-[#1A1A2E]">{driver.name}</div>
-                        <div className="text-sm text-gray-400 f1-mono">
+                        <div className="text-sm font-semibold text-foreground">{driver.name}</div>
+                        <div className="text-sm text-muted-foreground f1-mono">
                           {driver.nationality} {driver.flag} · {driver.points} pts
                         </div>
                       </div>
@@ -247,10 +247,10 @@ export default function ConstructorProfileModal({
               { label: "WINS", value: constructorData?.wins ?? "—", icon: Trophy },
               { label: "PODIUMS", value: constructorData?.podiums ?? "—", icon: Trophy },
             ].map(({ label, value, icon: Icon }) => (
-              <div key={label} className="bg-white rounded-sm p-3 border border-gray-100 text-center">
-                <Icon size={14} className="mx-auto mb-1 text-gray-300" />
-                <div className="font-black f1-stat-number text-lg text-[#1A1A2E]">{value}</div>
-                <div className="text-xs text-gray-400 f1-mono">{label}</div>
+              <div key={label} className="bg-card rounded-sm p-3 border border-border text-center">
+                <Icon size={14} className="mx-auto mb-1 text-muted-foreground" />
+                <div className="font-black f1-stat-number text-lg text-foreground">{value}</div>
+                <div className="text-xs text-muted-foreground f1-mono">{label}</div>
               </div>
             ))}
           </div>
@@ -258,8 +258,8 @@ export default function ConstructorProfileModal({
           {/* Performance & Latest Result */}
           <div className={`grid gap-4 ${(racesLoading || latestRaceResult || constructorData?.australiaResult) ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
             {/* Performance Radar */}
-            <div className="bg-white border border-gray-100 rounded-sm p-4 shadow-sm">
-              <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest mb-2">Performance Indices</div>
+            <div className="bg-card border border-border rounded-sm p-4 shadow-sm">
+              <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest mb-2">Performance Indices</div>
               <ResponsiveContainer width="100%" height={240}>
                 <RadarChart data={getRadarData(teamName)}>
                   <PolarGrid stroke="#e5e7eb" />
@@ -277,37 +277,37 @@ export default function ConstructorProfileModal({
                   />
                 </RadarChart>
               </ResponsiveContainer>
-              <div className="text-sm text-gray-400 f1-mono text-center mt-1">Estimated performance indices</div>
+              <div className="text-sm text-muted-foreground f1-mono text-center mt-1">Estimated performance indices</div>
             </div>
 
             {/* Latest Race Result */}
             {(racesLoading || latestRaceResult || constructorData?.australiaResult) && (
-              <div className="bg-[#1A1A2E] rounded-sm p-4">
+              <div className="bg-card rounded-sm p-4">
                 {racesLoading ? (
-                  <div className="text-white/40 text-[13px] f1-mono uppercase tracking-widest">Loading latest result...</div>
+                  <div className="text-muted-foreground text-[13px] f1-mono uppercase tracking-widest">Loading latest result...</div>
                 ) : latestRaceResult ? (
                   <>
-                    <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-2">
+                    <div className="text-muted-foreground text-xs f1-mono uppercase tracking-widest mb-2">
                       Latest Race — {latestRaceResult.race.name}
                     </div>
                     <div className="space-y-2">
                       {latestRaceResult.teamResults.map((r: any, i: number) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="text-white font-black f1-stat-number text-sm">P{r.position}</span>
-                            <span className="text-white text-sm">{r.driver}</span>
+                            <span className="text-card-foreground font-black f1-stat-number text-sm">P{r.position}</span>
+                            <span className="text-card-foreground text-sm">{r.driver}</span>
                           </div>
-                          <span className="text-white/60 text-sm f1-mono">{r.points} pts</span>
+                          <span className="text-muted-foreground text-sm f1-mono">{r.points} pts</span>
                         </div>
                       ))}
                     </div>
                   </>
                 ) : constructorData?.australiaResult ? (
                   <>
-                    <div className="text-white/40 text-xs f1-mono uppercase tracking-widest mb-2">
+                    <div className="text-muted-foreground text-xs f1-mono uppercase tracking-widest mb-2">
                       Australian GP Result
                     </div>
-                    <div className="text-white font-bold f1-mono text-sm">{constructorData.australiaResult}</div>
+                    <div className="text-card-foreground font-bold f1-mono text-sm">{constructorData.australiaResult}</div>
                   </>
                 ) : null}
               </div>
@@ -317,12 +317,12 @@ export default function ConstructorProfileModal({
           {/* Collapsible Technical Analysis */}
           {carSpec && (
             <Collapsible open={techOpen} onOpenChange={setTechOpen} className="mb-6">
-              <CollapsibleTrigger className="w-full flex items-center justify-between bg-white border border-gray-100 rounded-sm p-4 shadow-sm hover:border-gray-300 transition-colors cursor-pointer">
+              <CollapsibleTrigger className="w-full flex items-center justify-between bg-card border border-border rounded-sm p-4 shadow-sm hover:border-muted-foreground/30 transition-colors cursor-pointer">
                 <div className="flex items-center gap-2">
                   <Settings size={14} className="text-[#E8002D]" />
-                  <span className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide">Technical Analysis</span>
+                  <span className="f1-display text-sm font-black text-foreground uppercase tracking-wide">Technical Analysis</span>
                 </div>
-                <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${techOpen ? "rotate-180" : ""}`} />
+                <ChevronDown size={16} className={`text-muted-foreground transition-transform duration-200 ${techOpen ? "rotate-180" : ""}`} />
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-4 mt-2">
                 {/* Tech Specs Grid */}
@@ -345,9 +345,9 @@ export default function ConstructorProfileModal({
                     { label: "Fuel", value: carSpec.fuel },
                     { label: "Active Aero", value: carSpec.activeAero ? "Yes — X/Z Mode" : "No" },
                   ].map(({ label, value }) => (
-                    <div key={label} className="bg-gray-50 rounded-sm p-2.5">
-                      <div className="text-[13px] text-gray-400 f1-mono uppercase tracking-widest">{label}</div>
-                      <div className="text-sm font-medium text-[#1A1A2E] mt-0.5 f1-mono">{value}</div>
+                    <div key={label} className="bg-muted rounded-sm p-2.5">
+                      <div className="text-[13px] text-muted-foreground f1-mono uppercase tracking-widest">{label}</div>
+                      <div className="text-sm font-medium text-foreground mt-0.5 f1-mono">{value}</div>
                     </div>
                   ))}
                 </div>
@@ -355,14 +355,14 @@ export default function ConstructorProfileModal({
                 {/* Strengths & Challenges */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Strengths */}
-                  <div className="bg-white border border-gray-100 rounded-sm p-4">
+                  <div className="bg-card border border-border rounded-sm p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <CheckCircle size={14} className="text-green-500" />
-                      <span className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide">Strengths</span>
+                      <span className="f1-display text-sm font-black text-foreground uppercase tracking-wide">Strengths</span>
                     </div>
                     <div className="space-y-1.5">
                       {carSpec.strengths?.map((s, i) => (
-                        <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                        <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
                           <span className="leading-relaxed">{s}</span>
                         </div>
@@ -371,14 +371,14 @@ export default function ConstructorProfileModal({
                   </div>
 
                   {/* Challenges */}
-                  <div className="bg-white border border-gray-100 rounded-sm p-4">
+                  <div className="bg-card border border-border rounded-sm p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <XCircle size={14} className="text-red-500" />
-                      <span className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide">Challenges</span>
+                      <span className="f1-display text-sm font-black text-foreground uppercase tracking-wide">Challenges</span>
                     </div>
                     <div className="space-y-1.5">
                       {carSpec.weaknesses?.map((w, i) => (
-                        <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                        <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                           <span className="mt-1 w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
                           <span className="leading-relaxed">{w}</span>
                         </div>

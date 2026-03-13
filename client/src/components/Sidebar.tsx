@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { RACES_2026 } from "@/lib/f1Data";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   LayoutDashboard,
   Users,
@@ -14,6 +15,8 @@ import {
   Flag,
   Menu,
   X,
+  Moon,
+  Sun,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -36,7 +39,9 @@ const nextRace = RACES_2026.find(r => r.status === "next");
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const SidebarContent = () => (
+  const SidebarContent = () => {
+    const { theme, toggleTheme } = useTheme();
+    return (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-white/10">
@@ -123,20 +128,34 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
         </div>
       </nav>
 
-      {/* Footer */}
+      {/* Footer with theme toggle */}
       <div className="px-6 py-4 border-t border-white/10">
-        <div className="text-white/30 text-sm f1-mono">Data current as of</div>
-        <div className="text-white/50 text-sm f1-mono">Round 1 — Australia 2026</div>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <div className="text-white/30 text-sm f1-mono">Data current as of</div>
+            <div className="text-white/50 text-sm f1-mono">Round 1 — Australia 2026</div>
+          </div>
+          {toggleTheme && (
+            <button
+              onClick={toggleTheme}
+              className="w-8 h-8 rounded-sm bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white/70 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
+  };
 
   return (
     <>
       {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-[#1A1A2E] text-white rounded-sm flex items-center justify-center shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-sidebar text-white rounded-sm flex items-center justify-center shadow-lg"
       >
         {mobileOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
@@ -150,14 +169,14 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-[#1A1A2E] h-screen sticky top-0 shrink-0">
+      <aside className="hidden lg:flex flex-col w-64 bg-sidebar h-screen sticky top-0 shrink-0">
         <SidebarContent />
       </aside>
 
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-[#1A1A2E] z-50 transition-transform duration-300",
+          "lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-sidebar z-50 transition-transform duration-300",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
