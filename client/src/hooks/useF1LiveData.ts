@@ -149,8 +149,16 @@ export function useRaceResults() {
     retry: 2,
   });
 
+  const races = (liveData?.races ?? []).map((race: any) => ({
+    ...race,
+    results: race.results?.map((r: any) => ({
+      ...r,
+      team: CONSTRUCTOR_ID_TO_DISPLAY[r.constructorId ?? ""] ?? r.team,
+    })),
+  }));
+
   return {
-    races: liveData?.races ?? [],
+    races,
     isLive: !!liveData,
     isLoading,
     updatedAt: liveData?.updatedAt ?? null,

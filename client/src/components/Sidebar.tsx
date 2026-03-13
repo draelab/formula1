@@ -9,7 +9,6 @@ import {
   Users,
   Building2,
   MapPin,
-  Car,
   TrendingUp,
   ChevronRight,
   Flag,
@@ -28,7 +27,6 @@ const NAV_ITEMS = [
   { id: "constructors", label: "Constructors", icon: Building2 },
   { id: "races", label: "Races", icon: MapPin },
   { id: "predictions", label: "Predictions", icon: TrendingUp },
-  { id: "cars", label: "Car Breakdown", icon: Car },
 ];
 
 const completedRaces = RACES_2026.filter(r => r.status === "completed");

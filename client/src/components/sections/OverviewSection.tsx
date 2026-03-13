@@ -32,15 +32,20 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
     ? liveSchedule.find((r: any) => new Date(r.date) >= today)
     : RACES_2026.find(r => r.status === "next");
 
-  // Top 5 results from last race
-  const raceTop5 = lastRace && (lastRace as any).results
-    ? (lastRace as any).results.slice(0, 5)
+  // Top 10 results from last race
+  const raceTop10 = lastRace && (lastRace as any).results
+    ? (lastRace as any).results.slice(0, 10)
     : [
         { givenName: "George", familyName: "Russell", team: "Mercedes", points: 25 },
         { givenName: "Kimi", familyName: "Antonelli", team: "Mercedes", points: 18 },
         { givenName: "Charles", familyName: "Leclerc", team: "Ferrari", points: 15 },
         { givenName: "Lewis", familyName: "Hamilton", team: "Ferrari", points: 12 },
         { givenName: "Lando", familyName: "Norris", team: "McLaren", points: 10 },
+        { givenName: "Max", familyName: "Verstappen", team: "Red Bull Racing", points: 8 },
+        { givenName: "Oliver", familyName: "Bearman", team: "Haas", points: 6 },
+        { givenName: "Liam", familyName: "Lawson", team: "Racing Bulls", points: 4 },
+        { givenName: "Gabriel", familyName: "Bortoleto", team: "Audi", points: 2 },
+        { givenName: "Pierre", familyName: "Gasly", team: "Alpine", points: 1 },
       ];
 
   const maxPoints = Math.max(...top5Drivers.map((d: any) => Number(d.points) || 0));
@@ -149,9 +154,9 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
 
           {/* Top 5 Results */}
           <div className="space-y-0">
-            {raceTop5.map((result: any, idx: number) => {
+            {raceTop10.map((result: any, idx: number) => {
               const teamColor = TEAM_COLORS[result.team] || "#666";
-              const posColors = ["bg-[#E8002D] text-white", "bg-[#1A1A2E] text-white", "bg-[#1A1A2E] text-white", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent"];
+              const posColors = ["bg-[#E8002D] text-white", "bg-[#1A1A2E] text-white", "bg-[#1A1A2E] text-white", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent"];
               return (
                 <div key={idx} className="flex items-center py-3 border-b border-gray-100 last:border-b-0">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-4 ${posColors[idx]}`}
@@ -174,8 +179,18 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
 
           {/* Race Footer */}
           <div className="mt-4 flex items-center justify-between text-xs text-gray-400 f1-mono">
-            <div>Pole: G. Russell · Fastest Lap: M. Verstappen</div>
-            <div>Laps: 58</div>
+            <div>
+              {(() => {
+                if (!lastRace || !(lastRace as any).results) return "Pole: G. Russell · Fastest Lap: M. Verstappen";
+                const results = (lastRace as any).results;
+                const pole = results.find((r: any) => r.grid === "1" || r.grid === 1);
+                const fl = results.find((r: any) => r.fastestLap);
+                const poleName = pole ? `${(pole.givenName ?? "")[0]}. ${pole.familyName ?? pole.driver ?? ""}` : "—";
+                const flName = fl ? `${(fl.givenName ?? "")[0]}. ${fl.familyName ?? fl.driver ?? ""}` : "—";
+                return `Pole: ${poleName} · Fastest Lap: ${flName}`;
+              })()}
+            </div>
+            <div>Laps: {(lastRace as any)?.laps || 58}</div>
           </div>
         </div>
 
@@ -264,11 +279,15 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
 
           {/* 2026 Key Changes */}
           <div className="p-6">
-            <h3 className="f1-display text-white text-lg font-black uppercase mb-3">2026 Key Changes</h3>
+            <h3 className="f1-display text-white text-lg font-black uppercase mb-3">2026 Regulation Changes</h3>
             <div className="space-y-2">
               {[
                 { icon: "⚡", text: "350kW MGU-K — 3× more electric power" },
-                { icon: "🌬️", text: "Active aerodynamics replace DRS" },
+                { icon: "✈️", text: "Active aero X-Mode/Z-Mode replaces DRS" },
+                { icon: "⚖️", text: "30kg lighter — 768kg minimum weight" },
+                { icon: "📏", text: "Shorter & narrower — 200mm shorter, 50mm narrower" },
+                { icon: "🔋", text: "50/50 combustion/electric power split" },
+                { icon: "⛽", text: "100% sustainable fuel mandatory" },
                 { icon: "🏎️", text: "Audi & Cadillac debut as new teams" },
               ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-2 text-white/70 text-sm">

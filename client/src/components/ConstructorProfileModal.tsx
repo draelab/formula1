@@ -1,0 +1,349 @@
+// F1 2026 Dashboard — Constructor Profile Modal
+// Full team profile with car, drivers, performance radar, and technical analysis
+
+import { useState, useMemo, useEffect } from "react";
+import { CONSTRUCTORS_2026, CAR_SPECS_2026, DRIVERS_2026, TEAM_COLORS, TEAM_CAR_IMAGES } from "@/lib/f1Data";
+import { useRaceResults } from "@/hooks/useF1LiveData";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  Radar,
+  ResponsiveContainer,
+} from "recharts";
+import { Trophy, Gauge, Hash, Zap, Settings, ChevronDown, CheckCircle, XCircle } from "lucide-react";
+
+interface ConstructorProfileModalProps {
+  teamName: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const RADAR_DATA_2026: Record<string, number[]> = {
+  "Mercedes":        [96, 91, 88, 90, 92, 86],
+  "Ferrari":         [89, 93, 91, 88, 84, 89],
+  "McLaren":         [89, 88, 92, 87, 86, 93],
+  "Red Bull Racing": [83, 90, 86, 85, 85, 94],
+  "Haas":            [88, 73, 76, 82, 78, 74],
+  "Racing Bulls":    [83, 75, 78, 80, 76, 71],
+  "Audi":            [74, 71, 73, 72, 72, 76],
+  "Alpine":          [88, 74, 76, 79, 74, 78],
+  "Williams":        [88, 75, 77, 80, 75, 80],
+  "Cadillac":        [88, 66, 68, 68, 66, 75],
+  "Aston Martin":    [84, 72, 75, 76, 73, 82],
+};
+
+const getRadarData = (team: string) => {
+  const vals = RADAR_DATA_2026[team] ?? [70, 70, 70, 70, 70, 70];
+  return [
+    { subject: "Power", A: vals[0] },
+    { subject: "Aero", A: vals[1] },
+    { subject: "Mech. Grip", A: vals[2] },
+    { subject: "Reliability", A: vals[3] },
+    { subject: "Strategy", A: vals[4] },
+    { subject: "Driver", A: vals[5] },
+  ];
+};
+
+export default function ConstructorProfileModal({
+  teamName,
+  open,
+  onOpenChange,
+}: ConstructorProfileModalProps) {
+  const [techOpen, setTechOpen] = useState(false);
+  useEffect(() => { setTechOpen(false); }, [teamName]);
+  const { races, isLoading: racesLoading } = useRaceResults();
+
+  const constructor = teamName ? CONSTRUCTORS_2026.find((c) => c.name === teamName) : null;
+  const carSpec = teamName ? CAR_SPECS_2026.find((c) => c.team === teamName) : null;
+  const teamDrivers = teamName ? DRIVERS_2026.filter((d) => d.team === teamName) : [];
+  const teamColor = teamName ? TEAM_COLORS[teamName] || "#888" : "#888";
+  const carImage = teamName ? TEAM_CAR_IMAGES[teamName] : undefined;
+
+  const latestRaceResult = useMemo(() => {
+    if (!teamName || races.length === 0) return null;
+    const lastRace = races[races.length - 1];
+    if (!lastRace?.results?.length) return null;
+    const teamResults = lastRace.results
+      .filter((r: any) => r.team === teamName)
+      .sort((a: any, b: any) => Number(a.position) - Number(b.position));
+    if (teamResults.length === 0) return null;
+    return { race: lastRace, teamResults };
+  }, [races, teamName]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
+        showCloseButton={false}
+      >
+        <DialogTitle className="sr-only">{teamName} — Constructor Profile</DialogTitle>
+        {!teamName ? null : (<>
+
+        {/* Header band — team color background */}
+        <div className="relative overflow-hidden" style={{ backgroundColor: teamColor }}>
+          {/* Close button */}
+          <button
+            onClick={() => onOpenChange(false)}
+            aria-label="Close constructor profile"
+            className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/30 text-white flex items-center justify-center hover:bg-black/50 transition-colors"
+          >
+            ✕
+          </button>
+
+          {/* Car image */}
+          <div className="flex items-center justify-center p-6 pb-2">
+            <div className="h-48 md:h-64 max-w-2xl w-full flex items-center justify-center">
+              {carImage && (
+                <img
+                  src={carImage}
+                  alt={`${teamName} car`}
+                  className="h-full object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Team name & chassis info */}
+          <div className="text-white text-center pb-6 px-6">
+            <h2 className="f1-display text-3xl md:text-4xl font-black uppercase leading-none mb-2">
+              {teamName}
+            </h2>
+            <div className="text-white/70 text-sm f1-mono">
+              {constructor?.chassis} · {constructor?.powerUnit}
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-6">
+
+          {/* Identity & Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* Left column — team identity */}
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-10 h-10 rounded-sm flex items-center justify-center text-white font-black f1-stat-number text-lg"
+                  style={{ backgroundColor: teamColor }}
+                >
+                  P{constructor?.position}
+                </div>
+                <div>
+                  <div className="f1-display text-2xl font-black uppercase text-[#1A1A2E]">{teamName}</div>
+                  <div className="text-xs text-gray-500 f1-mono">{constructor?.chassis} · {constructor?.powerUnit}</div>
+                </div>
+              </div>
+
+              {carSpec?.activeAero && (
+                <div className="inline-flex items-center gap-1 bg-yellow-400 text-[#1A1A2E] px-2 py-0.5 text-xs font-bold f1-mono rounded-sm mb-3">
+                  <Zap size={10} /> ACTIVE AERO
+                </div>
+              )}
+
+              {carSpec?.keyFeatures && carSpec.keyFeatures.length > 0 && (
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
+                  {carSpec.keyFeatures.map((feat, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                      <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: teamColor }} />
+                      <span className="leading-relaxed">{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right column — 2026 Drivers */}
+            <div>
+              <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">2026 Drivers</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {teamDrivers.map((driver) => (
+                  <div key={driver.number} className="bg-white border border-gray-100 rounded-sm p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div
+                        className="w-8 h-8 rounded-sm flex items-center justify-center font-black f1-stat-number text-sm"
+                        style={{ backgroundColor: `${teamColor}20`, color: teamColor }}
+                      >
+                        {driver.number}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#1A1A2E]">{driver.name}</div>
+                        <div className="text-xs text-gray-400 f1-mono">
+                          {driver.nationality} {driver.flag}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500 f1-mono mt-1">{driver.points} pts</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { label: "POSITION", value: constructor?.position ?? "—", icon: Hash },
+              { label: "POINTS", value: constructor?.points ?? "—", icon: Gauge },
+              { label: "WINS", value: constructor?.wins ?? "—", icon: Trophy },
+              { label: "PODIUMS", value: constructor?.podiums ?? "—", icon: Trophy },
+            ].map(({ label, value, icon: Icon }) => (
+              <div key={label} className="bg-white rounded-sm p-3 border border-gray-100 text-center">
+                <Icon size={14} className="mx-auto mb-1 text-gray-300" />
+                <div className="font-black f1-stat-number text-lg text-[#1A1A2E]">{value}</div>
+                <div className="text-[10px] text-gray-400 f1-mono">{label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Latest Race Result */}
+          {(racesLoading || latestRaceResult || constructor?.australiaResult) && (
+            <div className="bg-[#1A1A2E] rounded-sm p-4">
+              {racesLoading ? (
+                <div className="text-white/40 text-xs f1-mono uppercase tracking-widest">Loading latest result...</div>
+              ) : latestRaceResult ? (
+                <>
+                  <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
+                    Latest Race — {latestRaceResult.race.name}
+                  </div>
+                  <div className="space-y-2">
+                    {latestRaceResult.teamResults.map((r: any, i: number) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white font-black f1-stat-number text-sm">P{r.position}</span>
+                          <span className="text-white text-sm">{r.driver}</span>
+                        </div>
+                        <span className="text-white/60 text-xs f1-mono">{r.points} pts</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : constructor?.australiaResult ? (
+                <>
+                  <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
+                    Australian GP Result
+                  </div>
+                  <div className="text-white font-bold f1-mono text-sm">{constructor.australiaResult}</div>
+                </>
+              ) : null}
+            </div>
+          )}
+
+          {/* Performance Radar */}
+          <div className="bg-white border border-gray-100 rounded-sm p-4 shadow-sm">
+            <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Performance Indices</div>
+            <ResponsiveContainer width="100%" height={240}>
+              <RadarChart data={getRadarData(teamName)}>
+                <PolarGrid stroke="#e5e7eb" />
+                <PolarAngleAxis
+                  dataKey="subject"
+                  tick={{ fontSize: 10, fontFamily: "IBM Plex Mono", fill: "#888" }}
+                />
+                <Radar
+                  name={teamName}
+                  dataKey="A"
+                  stroke={teamColor}
+                  fill={teamColor}
+                  fillOpacity={0.2}
+                  strokeWidth={2}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
+            <div className="text-xs text-gray-400 f1-mono text-center mt-1">Estimated performance indices</div>
+          </div>
+
+          {/* Collapsible Technical Analysis */}
+          {carSpec && (
+            <Collapsible open={techOpen} onOpenChange={setTechOpen} className="mb-6">
+              <CollapsibleTrigger className="w-full flex items-center justify-between bg-white border border-gray-100 rounded-sm p-4 shadow-sm hover:border-gray-300 transition-colors cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <Settings size={14} className="text-[#E8002D]" />
+                  <span className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide">Technical Analysis</span>
+                </div>
+                <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${techOpen ? "rotate-180" : ""}`} />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 mt-2">
+                {/* Tech Specs Grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Chassis", value: carSpec.chassis },
+                    { label: "Power Unit", value: carSpec.powerUnit },
+                    { label: "Engine Config", value: carSpec.engineConfig },
+                    { label: "Displacement", value: carSpec.displacement },
+                    { label: "Max RPM", value: carSpec.maxRPM || "~15,000 rpm" },
+                    { label: "Hybrid System", value: carSpec.hybridSystem },
+                    { label: "MGU-K Power", value: carSpec.mguKPower },
+                    { label: "Total Power", value: carSpec.totalPower },
+                    { label: "Weight (w/ driver)", value: carSpec.weight },
+                    { label: "Gearbox", value: carSpec.gearbox },
+                    { label: "Front Suspension", value: carSpec.frontSuspension },
+                    { label: "Rear Suspension", value: carSpec.rearSuspension },
+                    { label: "Brakes", value: carSpec.brakes },
+                    { label: "Wheels", value: carSpec.wheels },
+                    { label: "Fuel", value: carSpec.fuel },
+                    { label: "Active Aero", value: carSpec.activeAero ? "Yes — X/Z Mode" : "No" },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="bg-gray-50 rounded-sm p-2.5">
+                      <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest">{label}</div>
+                      <div className="text-sm font-medium text-[#1A1A2E] mt-0.5 f1-mono">{value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Strengths & Challenges */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Strengths */}
+                  <div className="bg-white border border-gray-100 rounded-sm p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle size={14} className="text-green-500" />
+                      <span className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide">Strengths</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {carSpec.strengths?.map((s, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                          <span className="mt-1 w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+                          <span className="leading-relaxed">{s}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Challenges */}
+                  <div className="bg-white border border-gray-100 rounded-sm p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <XCircle size={14} className="text-red-500" />
+                      <span className="f1-display text-sm font-black text-[#1A1A2E] uppercase tracking-wide">Challenges</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {carSpec.weaknesses?.map((w, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                          <span className="mt-1 w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                          <span className="leading-relaxed">{w}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+        </div>
+        </>)}
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -9,9 +9,8 @@ import DriversSection from "@/components/sections/DriversSection";
 import ConstructorsSection from "@/components/sections/ConstructorsSection";
 import RacesSection from "@/components/sections/RacesSection";
 import PredictionsSection from "@/components/sections/PredictionsSection";
-import CarsSection from "@/components/sections/CarsSection";
 
-type Section = "overview" | "drivers" | "constructors" | "races" | "predictions" | "cars";
+type Section = "overview" | "drivers" | "constructors" | "races" | "predictions";
 
 export default function Dashboard() {
   const [activeSection, setActiveSection] = useState<Section>("overview");
@@ -30,7 +29,7 @@ export default function Dashboard() {
         return (
           <DriversSection
             onNavigateToTeam={(team) => navigateToSection("constructors", team)}
-            onNavigateToCar={(team) => navigateToSection("cars", team)}
+            onNavigateToCar={(team) => navigateToSection("constructors", team)}
           />
         );
       case "constructors":
@@ -39,8 +38,6 @@ export default function Dashboard() {
         return <RacesSection />;
       case "predictions":
         return <PredictionsSection />;
-      case "cars":
-        return <CarsSection key={teamContext} initialTeam={teamContext} />;
       default:
         return <OverviewSection onSectionChange={(s) => navigateToSection(s)} />;
     }
