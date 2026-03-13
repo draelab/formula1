@@ -219,6 +219,19 @@ export function usePracticeSessions(circuitShortName: string | null) {
   return { practice: data, isLoading };
 }
 
+// ─── Sprint Qualifying Hook ─────────────────────────────────────────────────
+export function useSprintQualifying(circuitShortName: string | null) {
+  const { data, isLoading } = trpc.f1.sprintQualifying.useQuery(
+    { circuitShortName: circuitShortName! },
+    {
+      enabled: !!circuitShortName,
+      staleTime: 1000 * 60 * 10,
+      retry: 2,
+    }
+  );
+  return { sprintQualifying: data, isLoading };
+}
+
 // ─── Circuit History Hook ────────────────────────────────────────────────────
 export function useCircuitHistory(circuitId: string | null) {
   const { data, isLoading } = trpc.f1.circuitHistory.useQuery(

@@ -306,6 +306,60 @@ const f1Router = router({
       }
     }),
 
+  /** Sprint qualifying lap times from OpenF1 */
+  sprintQualifying: publicProcedure
+    .input(z.object({ circuitShortName: z.string() }))
+    .query(async ({ input }) => {
+      const CACHE_KEY = `sprintQualifying_${input.circuitShortName}`;
+      try {
+        // Find sprint qualifying session for this circuit
+        const sessions = await fetchOpenF1(
+          `/sessions?year=${CURRENT_YEAR}&circuit_short_name=${input.circuitShortName}&session_name=Sprint%20Qualifying`
+        );
+        if (!sessions?.length) return await cacheGet(CACHE_KEY);
+
+        const session = sessions[0]; // One sprint qualifying per circuit per year
+        const laps = await fetchOpenF1(
+          `/laps?session_key=${session.session_key}&is_pit_out_lap=false`
+        );
+
+        // Group by driver, find fastest lap for each
+        const driverBest: Record<number, any> = {};
+        for (const lap of (laps ?? [])) {
+          if (!lap.lap_duration || lap.lap_duration <= 0) continue;
+          const num = lap.driver_number;
+          if (!driverBest[num] || lap.lap_duration < driverBest[num].lap_duration) {
+            driverBest[num] = lap;
+          }
+        }
+
+        // Sort by fastest time
+        const sorted = Object.values(driverBest)
+          .sort((a: any, b: any) => a.lap_duration - b.lap_duration);
+
+        const result = {
+          circuitShortName: input.circuitShortName,
+          sessionName: session.session_name,
+          sessionKey: session.session_key,
+          dateStart: session.date_start,
+          results: sorted.slice(0, 20).map((lap: any, idx: number) => ({
+            position: idx + 1,
+            driverNumber: lap.driver_number,
+            lapDuration: lap.lap_duration,
+            sector1: lap.duration_sector_1,
+            sector2: lap.duration_sector_2,
+            sector3: lap.duration_sector_3,
+          })),
+          updatedAt: new Date().toISOString(),
+        };
+        await cacheSet(CACHE_KEY, result);
+        return result;
+      } catch (err) {
+        console.error("[F1 API] sprintQualifying error:", err);
+        return await cacheGet(CACHE_KEY);
+      }
+    }),
+
   /** Historical results at a specific circuit (for predictions) */
   circuitHistory: publicProcedure
     .input(z.object({ circuitId: z.string() }))

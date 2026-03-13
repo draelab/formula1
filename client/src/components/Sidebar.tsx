@@ -29,7 +29,7 @@ const NAV_ITEMS = [
   { id: "drivers", label: "Drivers", icon: Users },
   { id: "constructors", label: "Constructors", icon: Building2 },
   { id: "races", label: "Races", icon: MapPin },
-  { id: "current-race", label: "Current Race", icon: Flag },
+  { id: "current-race", label: "Race Weekend", icon: Flag },
   { id: "predictions", label: "Predictions", icon: TrendingUp },
 ];
 

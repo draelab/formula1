@@ -1,5 +1,5 @@
 // F1 2026 Dashboard — Current Race Weekend Section
-// Shows the most recent or upcoming race weekend with all session results
+// Shows any race weekend with all session results, navigable by round
 
 import { useState, useMemo } from "react";
 import {
@@ -7,12 +7,13 @@ import {
   useRaceResults,
   useQualifying,
   useSprintResults,
+  useSprintQualifying,
   usePracticeSessions,
   useDriverStandings,
 } from "@/hooks/useF1LiveData";
 import { RACES_2026, VENUE_IMAGES } from "@/lib/f1Data";
 import { cn } from "@/lib/utils";
-import { Clock, Trophy, Zap } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Trophy, Zap } from "lucide-react";
 
 // ─── Circuit name mapping for OpenF1 API ─────────────────────────────────────
 const CIRCUIT_SHORT_NAMES: Record<string, string> = {
@@ -71,7 +72,7 @@ const CONSTRUCTOR_ID_TO_COLOR: Record<string, string> = {
   aston_martin: "#358C75",
 };
 
-type SessionTab = "FP1" | "FP2" | "FP3" | "Qualifying" | "Sprint" | "Race";
+type SessionTab = "FP1" | "FP2" | "FP3" | "Sprint Qualifying" | "Qualifying" | "Sprint" | "Race";
 
 function formatLapTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -85,16 +86,14 @@ export default function CurrentRaceSection() {
   const { races: raceResults, isLoading: resultsLoading } = useRaceResults();
   const { standings } = useDriverStandings();
 
-  // Find the current/most recent round
-  const currentRound = useMemo(() => {
-    // First try from static data — find the "next" or last "completed" race
+  // Find the default round (current/most recent)
+  const defaultRound = useMemo(() => {
     const nextRace = RACES_2026.find((r) => r.status === "next");
     if (nextRace) return nextRace.round;
 
     const completed = RACES_2026.filter((r) => r.status === "completed");
     if (completed.length > 0) return completed[completed.length - 1].round;
 
-    // Fallback: use schedule data with today's date
     if (scheduleRaces.length > 0) {
       const today = new Date();
       const past = scheduleRaces.filter(
@@ -107,9 +106,12 @@ export default function CurrentRaceSection() {
     return 1;
   }, [scheduleRaces]);
 
+  // Round selector state
+  const [selectedRound, setSelectedRound] = useState<number | null>(null);
+  const currentRound = selectedRound ?? defaultRound;
+
   // Get static race info
   const staticRace = RACES_2026.find((r) => r.round === currentRound);
-  // Get schedule race info (from API)
   const scheduleRace = scheduleRaces.find(
     (r: any) => r.round === currentRound
   );
@@ -127,6 +129,9 @@ export default function CurrentRaceSection() {
   const { qualifying, isLoading: qualiLoading } = useQualifying(currentRound);
   const { sprint, isLoading: sprintLoading } = useSprintResults(
     isSprint ? currentRound : null
+  );
+  const { sprintQualifying, isLoading: sqLoading } = useSprintQualifying(
+    isSprint ? circuitShortName : null
   );
   const { practice, isLoading: practiceLoading } =
     usePracticeSessions(circuitShortName);
@@ -150,26 +155,18 @@ export default function CurrentRaceSection() {
     return map;
   }, [standings]);
 
-  // Determine available session tabs
+  // Determine available session tabs based on weekend type
   const availableTabs = useMemo(() => {
     const tabs: SessionTab[] = [];
-    if (practice?.sessions) {
-      for (const s of practice.sessions) {
-        if (s.sessionName === "Practice 1") tabs.push("FP1");
-        else if (s.sessionName === "Practice 2") tabs.push("FP2");
-        else if (s.sessionName === "Practice 3") tabs.push("FP3");
-      }
+    if (isSprint) {
+      // Sprint weekend: FP1, Sprint Qualifying, Sprint, Qualifying, Race
+      tabs.push("FP1", "Sprint Qualifying", "Sprint", "Qualifying", "Race");
+    } else {
+      // Normal weekend: FP1, FP2, FP3, Qualifying, Race
+      tabs.push("FP1", "FP2", "FP3", "Qualifying", "Race");
     }
-    // If no practice data, still show FP tabs as placeholders
-    if (tabs.length === 0) {
-      tabs.push("FP1", "FP2");
-      if (!isSprint) tabs.push("FP3");
-    }
-    tabs.push("Qualifying");
-    if (isSprint) tabs.push("Sprint");
-    tabs.push("Race");
     return tabs;
-  }, [practice, isSprint]);
+  }, [isSprint]);
 
   // Default to last completed session (reverse chronological order)
   const [activeTab, setActiveTab] = useState<SessionTab | null>(null);
@@ -179,6 +176,7 @@ export default function CurrentRaceSection() {
     if (raceResult?.results?.length) return "Race";
     if (sprint?.results?.length) return "Sprint";
     if (qualifying?.results?.length) return "Qualifying";
+    if (isSprint && sprintQualifying?.results?.length) return "Sprint Qualifying";
     // Check practice sessions in reverse (FP3 > FP2 > FP1)
     const fpTabs = availableTabs.filter(t => t.startsWith("FP"));
     for (let i = fpTabs.length - 1; i >= 0; i--) {
@@ -188,9 +186,19 @@ export default function CurrentRaceSection() {
       );
       if (hasData) return fpTabs[i];
     }
-    // No session has data — show first tab instead of Race
     return availableTabs[0] ?? "Race";
-  }, [activeTab, availableTabs, raceResult, sprint, qualifying, practice]);
+  }, [activeTab, availableTabs, raceResult, sprint, qualifying, sprintQualifying, practice, isSprint]);
+
+  // Reset active tab when round changes
+  const handleRoundChange = (round: number) => {
+    setSelectedRound(round);
+    setActiveTab(null);
+  };
+
+  // Round navigation
+  const totalRounds = RACES_2026.length;
+  const hasPrev = currentRound > 1;
+  const hasNext = currentRound < totalRounds;
 
   const isLoading = scheduleLoading || resultsLoading;
 
@@ -204,7 +212,7 @@ export default function CurrentRaceSection() {
               2026 Season
             </div>
             <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">
-              Current Race Weekend
+              Race Weekend
             </h2>
           </div>
         </div>
@@ -225,9 +233,52 @@ export default function CurrentRaceSection() {
             2026 Season
           </div>
           <h2 className="f1-display text-3xl font-black text-foreground uppercase tracking-wide">
-            Current Race Weekend
+            Race Weekend
           </h2>
         </div>
+      </div>
+
+      {/* Round selector */}
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          onClick={() => hasPrev && handleRoundChange(currentRound - 1)}
+          disabled={!hasPrev}
+          className={cn(
+            "w-8 h-8 rounded-sm flex items-center justify-center transition-colors",
+            hasPrev
+              ? "bg-muted text-foreground hover:bg-muted/80"
+              : "bg-muted/30 text-muted-foreground/30 cursor-not-allowed"
+          )}
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        <select
+          value={currentRound}
+          onChange={(e) => handleRoundChange(Number(e.target.value))}
+          className="flex-1 bg-muted border border-border rounded-sm px-3 py-2 text-sm f1-mono text-foreground appearance-none cursor-pointer hover:bg-muted/80 transition-colors"
+        >
+          {RACES_2026.map((race) => (
+            <option key={race.round} value={race.round}>
+              R{race.round} — {race.name}
+              {race.isSprint ? " ⚡" : ""}
+              {race.status === "completed" ? " ✓" : race.status === "next" ? " ●" : ""}
+            </option>
+          ))}
+        </select>
+
+        <button
+          onClick={() => hasNext && handleRoundChange(currentRound + 1)}
+          disabled={!hasNext}
+          className={cn(
+            "w-8 h-8 rounded-sm flex items-center justify-center transition-colors",
+            hasNext
+              ? "bg-muted text-foreground hover:bg-muted/80"
+              : "bg-muted/30 text-muted-foreground/30 cursor-not-allowed"
+          )}
+        >
+          <ChevronRight size={16} />
+        </button>
       </div>
 
       {/* Hero venue image */}
@@ -272,6 +323,7 @@ export default function CurrentRaceSection() {
             (tab === "Race" && raceResult?.results?.length) ||
             (tab === "Qualifying" && qualifying?.results?.length) ||
             (tab === "Sprint" && sprint?.results?.length) ||
+            (tab === "Sprint Qualifying" && sprintQualifying?.results?.length) ||
             (tab.startsWith("FP") &&
               practice?.sessions?.some(
                 (s: any) =>
@@ -291,7 +343,7 @@ export default function CurrentRaceSection() {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {tab}
+              {tab === "Sprint Qualifying" ? "SQ" : tab}
               {hasData && (
                 <span
                   className={cn(
@@ -316,6 +368,13 @@ export default function CurrentRaceSection() {
         {effectiveTab === "Sprint" && (
           <SprintResultsTable sprint={sprint} isLoading={sprintLoading} />
         )}
+        {effectiveTab === "Sprint Qualifying" && (
+          <SprintQualifyingTable
+            sprintQualifying={sprintQualifying}
+            isLoading={sqLoading}
+            driverMap={driverNumberMap}
+          />
+        )}
         {effectiveTab.startsWith("FP") && (
           <PracticeTable
             practice={practice}
@@ -332,6 +391,7 @@ export default function CurrentRaceSection() {
         raceResult={raceResult}
         qualifying={qualifying}
         sprint={sprint}
+        sprintQualifying={sprintQualifying}
         practice={practice}
       />
     </div>
@@ -608,6 +668,114 @@ function SprintResultsTable({
   );
 }
 
+// ─── Sprint Qualifying Table ─────────────────────────────────────────────────
+function SprintQualifyingTable({
+  sprintQualifying,
+  isLoading,
+  driverMap,
+}: {
+  sprintQualifying: any;
+  isLoading: boolean;
+  driverMap: Record<number, { name: string; team: string; code: string }>;
+}) {
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
+        Loading sprint qualifying data...
+      </div>
+    );
+  }
+  if (!sprintQualifying?.results?.length) {
+    return (
+      <div className="p-8 text-center text-muted-foreground f1-mono text-sm">
+        No sprint qualifying data available yet
+      </div>
+    );
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border bg-muted/50">
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground w-12">
+              Pos
+            </th>
+            <th className="text-left px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+              Driver
+            </th>
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+              Best Lap
+            </th>
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
+              S1
+            </th>
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
+              S2
+            </th>
+            <th className="text-right px-4 py-2.5 f1-mono text-[11px] uppercase tracking-widest text-muted-foreground hidden md:table-cell">
+              S3
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {sprintQualifying.results.map((r: any, idx: number) => {
+            const driver = driverMap[r.driverNumber];
+            const gap =
+              idx > 0
+                ? r.lapDuration - sprintQualifying.results[0].lapDuration
+                : null;
+            return (
+              <tr
+                key={idx}
+                className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+              >
+                <td className="px-4 py-2.5 f1-display font-black text-foreground">
+                  {r.position}
+                </td>
+                <td className="px-4 py-2.5">
+                  {driver ? (
+                    <>
+                      <span className="font-semibold text-foreground">
+                        {driver.name}
+                      </span>
+                      <span className="text-muted-foreground f1-mono text-xs ml-2">
+                        {driver.code}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="f1-mono text-muted-foreground">
+                      #{r.driverNumber}
+                    </span>
+                  )}
+                </td>
+                <td className="text-right px-4 py-2.5">
+                  <span className="f1-mono text-sm font-bold text-foreground">
+                    {formatLapTime(r.lapDuration)}
+                  </span>
+                  {gap !== null && (
+                    <span className="text-muted-foreground f1-mono text-xs ml-2">
+                      +{gap.toFixed(3)}
+                    </span>
+                  )}
+                </td>
+                <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground hidden md:table-cell">
+                  {r.sector1 ? r.sector1.toFixed(3) : "-"}
+                </td>
+                <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground hidden md:table-cell">
+                  {r.sector2 ? r.sector2.toFixed(3) : "-"}
+                </td>
+                <td className="text-right px-4 py-2.5 f1-mono text-sm text-muted-foreground hidden md:table-cell">
+                  {r.sector3 ? r.sector3.toFixed(3) : "-"}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ─── Practice Table ──────────────────────────────────────────────────────────
 function PracticeTable({
   practice,
@@ -730,50 +898,53 @@ function WeekendSchedule({
   raceResult,
   qualifying,
   sprint,
+  sprintQualifying,
   practice,
 }: {
   isSprint: boolean;
   raceResult: any;
   qualifying: any;
   sprint: any;
+  sprintQualifying: any;
   practice: any;
 }) {
   const sessions = useMemo(() => {
     const list: {
       name: string;
-      time: string;
+      day: string;
       completed: boolean;
     }[] = [];
 
-    // Determine which sessions have data
     const hasFP1 = practice?.sessions?.some(
       (s: any) => s.sessionName === "Practice 1" && s.results?.length > 0
     );
-    const hasFP2 = practice?.sessions?.some(
-      (s: any) => s.sessionName === "Practice 2" && s.results?.length > 0
-    );
-    const hasFP3 = practice?.sessions?.some(
-      (s: any) => s.sessionName === "Practice 3" && s.results?.length > 0
-    );
     const hasQuali = qualifying?.results?.length > 0;
-    const hasSprint = sprint?.results?.length > 0;
     const hasRace = raceResult?.results?.length > 0;
 
-    list.push({ name: "FP1", time: "Fri", completed: !!hasFP1 });
-    list.push({ name: "FP2", time: "Fri", completed: !!hasFP2 });
-
     if (isSprint) {
-      list.push({ name: "Qualifying", time: "Fri", completed: hasQuali });
-      list.push({ name: "Sprint", time: "Sat", completed: hasSprint });
-      list.push({ name: "Race", time: "Sun", completed: hasRace });
+      const hasSQ = sprintQualifying?.results?.length > 0;
+      const hasSprint = sprint?.results?.length > 0;
+      list.push({ name: "FP1", day: "Fri", completed: !!hasFP1 });
+      list.push({ name: "Sprint Qualifying", day: "Fri", completed: !!hasSQ });
+      list.push({ name: "Sprint", day: "Sat", completed: hasSprint });
+      list.push({ name: "Qualifying", day: "Sat", completed: hasQuali });
+      list.push({ name: "Race", day: "Sun", completed: hasRace });
     } else {
-      list.push({ name: "FP3", time: "Sat", completed: !!hasFP3 });
-      list.push({ name: "Qualifying", time: "Sat", completed: hasQuali });
-      list.push({ name: "Race", time: "Sun", completed: hasRace });
+      const hasFP2 = practice?.sessions?.some(
+        (s: any) => s.sessionName === "Practice 2" && s.results?.length > 0
+      );
+      const hasFP3 = practice?.sessions?.some(
+        (s: any) => s.sessionName === "Practice 3" && s.results?.length > 0
+      );
+      list.push({ name: "FP1", day: "Fri", completed: !!hasFP1 });
+      list.push({ name: "FP2", day: "Fri", completed: !!hasFP2 });
+      list.push({ name: "FP3", day: "Sat", completed: !!hasFP3 });
+      list.push({ name: "Qualifying", day: "Sat", completed: hasQuali });
+      list.push({ name: "Race", day: "Sun", completed: hasRace });
     }
 
     return list;
-  }, [isSprint, qualifying, sprint, raceResult, practice]);
+  }, [isSprint, qualifying, sprint, sprintQualifying, raceResult, practice]);
 
   return (
     <div className="bg-card rounded-sm p-5">
@@ -797,7 +968,7 @@ function WeekendSchedule({
               <Clock size={12} className="text-muted-foreground" />
             )}
             <span className="font-medium">{s.name}</span>
-            <span className="text-xs opacity-50">{s.time}</span>
+            <span className="text-xs opacity-50">{s.day}</span>
           </div>
         ))}
       </div>
