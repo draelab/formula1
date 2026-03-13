@@ -93,7 +93,7 @@ export default function ConstructorProfileModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0 relative"
+        className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{teamName} — Constructor Profile</DialogTitle>
