@@ -1,7 +1,7 @@
 // F1 2026 Dashboard — Constructors Section
 // Design: Team cards with livery colours, performance comparison charts
 
-import { CONSTRUCTORS_2026, TEAM_COLORS, DRIVERS_2026 } from "@/lib/f1Data";
+import { CONSTRUCTORS_2026, TEAM_COLORS, DRIVERS_2026, TEAM_CAR_IMAGES } from "@/lib/f1Data";
 import { useConstructorStandings } from "@/hooks/useF1LiveData";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, RadarChart, PolarGrid, PolarAngleAxis, Radar } from "recharts";
 import { useState } from "react";
@@ -123,6 +123,18 @@ export default function ConstructorsSection({ initialTeam }: ConstructorsSection
                   <div className="text-xs text-gray-400 f1-mono">PTS</div>
                 </div>
               </div>
+
+              {/* Car image */}
+              {TEAM_CAR_IMAGES[team.name] && (
+                <div className="h-16 flex items-center justify-center mb-1">
+                  <img
+                    src={TEAM_CAR_IMAGES[team.name]}
+                    alt={`${team.name} car`}
+                    className="h-full object-contain"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-50">
                 <div className="text-center">
