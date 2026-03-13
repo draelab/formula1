@@ -88,7 +88,7 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
       {!isLoading && view === "table" && (
         <div className="bg-white border border-gray-100 rounded-sm shadow-sm overflow-hidden">
           {/* Table header */}
-          <div className="grid grid-cols-[40px_40px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-2 bg-[#1A1A2E] text-white/50 text-xs f1-mono uppercase tracking-widest">
+          <div className="grid grid-cols-[40px_44px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-2 bg-[#1A1A2E] text-white/50 text-xs f1-mono uppercase tracking-widest">
             <div>POS</div>
             <div></div>
             <div>DRIVER</div>
@@ -108,7 +108,7 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
             return (
               <div key={driver.name || driver.driverId} className="border-b border-gray-50 last:border-0">
                 <div
-                  className="grid grid-cols-[40px_40px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-3 items-center cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  className="grid grid-cols-[40px_44px_1fr_120px_60px_60px_60px_60px_30px] gap-2 px-4 py-3 items-center cursor-pointer hover:bg-gray-50/50 transition-colors"
                   onClick={() => handleDriverClick(driver)}
                 >
                   {/* Position */}
@@ -116,9 +116,23 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
                     {pos}
                   </div>
 
-                  {/* Team colour bar */}
+                  {/* Driver headshot */}
                   <div className="flex items-center justify-center">
-                    <div className="w-1 h-8 rounded-full" style={{ backgroundColor: teamColor }} />
+                    <div
+                      className="w-10 h-10 rounded-full overflow-hidden border-2 bg-gray-100 flex-shrink-0"
+                      style={{ borderColor: teamColor }}
+                    >
+                      <img
+                        src={driver.headshot || driver.photo}
+                        alt={driver.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const el = e.target as HTMLImageElement;
+                          el.style.display = "none";
+                          el.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs font-bold text-gray-400 f1-mono">${driver.shortName}</div>`;
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Driver name */}

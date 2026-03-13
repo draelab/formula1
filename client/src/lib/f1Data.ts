@@ -65,6 +65,7 @@ export interface Driver {
   dateOfBirth: string;
   placeOfBirth: string;
   photo: string;
+  headshot: string;
   career: DriverCareer;
 }
 
@@ -72,6 +73,8 @@ export interface Driver {
 const F1_CDN = "https://media.formula1.com/image/upload";
 const driverPhoto = (team: string, id: string) =>
   `${F1_CDN}/c_fill,w_720/q_auto/v1740000000/common/f1/2026/${team}/${id}/2026${team}${id}right.webp`;
+const driverHeadshot = (team: string, id: string) =>
+  `${F1_CDN}/c_thumb,w_80,h_80,g_face/q_auto/v1740000000/common/f1/2026/${team}/${id}/2026${team}${id}right.webp`;
 const carPhoto = (team: string) =>
   `${F1_CDN}/c_lfill,h_224/q_auto/d_common:f1:2026:fallback:car:2026fallbackcarright.webp/v1740000000/common/f1/2026/${team}/2026${team}carright.webp`;
 
@@ -96,6 +99,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 28, australiaResult: 1,
     dateOfBirth: "15 February 1998", placeOfBirth: "King's Lynn, England",
     photo: driverPhoto("mercedes", "georus01"),
+    headshot: driverHeadshot("mercedes", "georus01"),
     bio: "George Russell took pole position and dominated the 2026 season opener in Melbourne, leading a Mercedes 1-2. A 2017 GP3 and 2018 Formula 2 champion, Russell spent three formative years at Williams before joining Mercedes in 2022. Known for his meticulous preparation and qualifying speed, he has steadily built himself into a title contender. His commanding victory in Australia marks him as the favourite for the 2026 championship.",
     career: { debutYear: 2019, seasonsInF1: 7, raceEntries: 152, wins: 5, podiums: 24, poles: 8, fastestLaps: 11, championships: 0, bestFinish: "4th (2022, 2025)", previousTeams: ["Williams", "Mercedes"], juniorFormula: "2017 GP3 champion, 2018 F2 champion" },
   },
@@ -105,6 +109,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 19, australiaResult: 2,
     dateOfBirth: "25 August 2006", placeOfBirth: "Bologna, Italy",
     photo: driverPhoto("mercedes", "andant01"),
+    headshot: driverHeadshot("mercedes", "andant01"),
     bio: "The teenage Italian sensation finished second on his debut season opener, completing a stunning Mercedes 1-2. Antonelli skipped Formula 3 entirely, going straight from Formula Regional European Championship to Formula 2, where he finished runner-up in 2024. A Mercedes junior driver since his karting days, he became the youngest driver to set a fastest lap in F1 history during his 2025 rookie season. At just 19, he is widely regarded as a generational talent.",
     career: { debutYear: 2025, seasonsInF1: 1, raceEntries: 24, wins: 0, podiums: 4, poles: 0, fastestLaps: 1, championships: 0, bestFinish: "7th (2025)", previousTeams: ["Mercedes"], juniorFormula: "2023 FRECA champion, 2024 F2 runner-up" },
   },
@@ -114,6 +119,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 28, australiaResult: 3,
     dateOfBirth: "16 October 1997", placeOfBirth: "Monte Carlo, Monaco",
     photo: driverPhoto("ferrari", "chalec01"),
+    headshot: driverHeadshot("ferrari", "chalec01"),
     bio: "Leclerc delivered a strong podium finish in Australia despite a Ferrari strategy error that cost him a potential victory. A graduate of the Ferrari Driver Academy, he won back-to-back GP3 and Formula 2 titles before debuting with Sauber in 2018 and earning a Ferrari seat just one year later. He holds the record for most pole positions without a world championship (27) and has been Ferrari's leading driver since 2019. His natural speed at circuits like Monaco and Monza has made him one of the most exciting drivers of his generation.",
     career: { debutYear: 2018, seasonsInF1: 8, raceEntries: 171, wins: 8, podiums: 50, poles: 27, fastestLaps: 11, championships: 0, bestFinish: "2nd (2022)", previousTeams: ["Sauber", "Ferrari"], juniorFormula: "2016 GP3 champion, 2017 F2 champion" },
   },
@@ -123,6 +129,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 41, australiaResult: 4,
     dateOfBirth: "7 January 1985", placeOfBirth: "Stevenage, England",
     photo: driverPhoto("ferrari", "lewham01"),
+    headshot: driverHeadshot("ferrari", "lewham01"),
     bio: "The most statistically successful driver in Formula 1 history, Hamilton holds all-time records for wins (105), pole positions (104), and podiums (202), sharing the record of seven World Championships with Michael Schumacher. After 12 seasons at Mercedes where he won six of his titles, he made a blockbuster move to Ferrari for 2025. His first season in red proved difficult as the team adjusted, but pre-season testing for 2026 showed encouraging pace. At 41, he remains one of the fastest and most determined drivers on the grid.",
     career: { debutYear: 2007, seasonsInF1: 19, raceEntries: 380, wins: 105, podiums: 202, poles: 104, fastestLaps: 68, championships: 7, championshipYears: "2008, 2014, 2015, 2017, 2018, 2019, 2020", previousTeams: ["McLaren", "Mercedes"], juniorFormula: "2006 GP2 champion" },
   },
@@ -132,6 +139,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 26, australiaResult: 5,
     dateOfBirth: "13 November 1999", placeOfBirth: "Bristol, England",
     photo: driverPhoto("mclaren", "lannor01"),
+    headshot: driverHeadshot("mclaren", "lannor01"),
     bio: "The reigning World Champion started his title defence with a fifth-place finish as McLaren's sole starter after Piastri's pre-race incident. Norris staged one of F1's greatest championship comebacks in 2025, overturning a 34-point deficit to beat Verstappen by just 2 points, becoming the first McLaren champion since Hamilton in 2008. A McLaren driver since his F1 debut in 2019, he has grown from a promising talent into a complete racing driver with 11 career victories. His number 1 on the car for 2026 signals his intent to defend his crown.",
     career: { debutYear: 2019, seasonsInF1: 7, raceEntries: 152, wins: 11, podiums: 44, poles: 16, fastestLaps: 18, championships: 1, championshipYears: "2025", previousTeams: ["McLaren"], juniorFormula: "2017 F3 European champion, 2018 F2 runner-up" },
   },
@@ -141,6 +149,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 28, australiaResult: 6,
     dateOfBirth: "30 September 1997", placeOfBirth: "Hasselt, Belgium",
     photo: driverPhoto("redbullracing", "maxver01"),
+    headshot: driverHeadshot("redbullracing", "maxver01"),
     bio: "A stunning recovery drive from 20th on the grid to 6th, with the fastest lap of the race, showcased the raw talent that has delivered four World Championships. The youngest driver to start an F1 race (17 years, 166 days) and youngest race winner (18 years, 228 days), Verstappen dominated the sport from 2021 to 2024 with a record-breaking 19-win season in 2023. He narrowly lost the 2025 title to Norris by just 2 points despite winning the most races (8). Now paired with Red Bull's new Ford-powered engine, he remains the benchmark against which all others are measured.",
     career: { debutYear: 2015, seasonsInF1: 11, raceEntries: 233, wins: 71, podiums: 127, poles: 48, fastestLaps: 37, championships: 4, championshipYears: "2021, 2022, 2023, 2024", previousTeams: ["Toro Rosso", "Red Bull Racing"], juniorFormula: "2014 FIA European F3 3rd" },
   },
@@ -150,6 +159,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 20, australiaResult: 7,
     dateOfBirth: "8 May 2005", placeOfBirth: "Chelmsford, England",
     photo: driverPhoto("haas", "olibea01"),
+    headshot: driverHeadshot("haas", "olibea01"),
     bio: "The young Brit delivered an impressive seventh-place finish for Haas, building on a remarkable start to his F1 career. Bearman made history in 2024 when he scored points on debut substituting for Sainz at Ferrari in Saudi Arabia (P7), becoming the first driver to score for two different teams in his first two races. A Ferrari Driver Academy member and 2021 Italian F4 champion, he earned his full-time Haas seat through three strong substitute appearances in 2024. His best result of 4th at the 2025 Mexico City Grand Prix showed his potential.",
     career: { debutYear: 2024, seasonsInF1: 2, raceEntries: 27, wins: 0, podiums: 0, poles: 0, fastestLaps: 0, championships: 0, bestFinish: "13th (2025)", previousTeams: ["Ferrari (sub)", "Haas"], juniorFormula: "2021 Italian F4 champion, 2023 F3 runner-up" },
   },
@@ -159,6 +169,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 18, australiaResult: 8,
     dateOfBirth: "8 August 2007", placeOfBirth: "London, England",
     photo: driverPhoto("racingbulls", "arvlin01"),
+    headshot: driverHeadshot("racingbulls", "arvlin01"),
     bio: "The sole rookie on the 2026 grid and the youngest driver in F1, Lindblad scored points on his debut with an eighth-place finish. Of British-Swedish heritage, he joined the Red Bull Junior Team at just 14 and has broken records at every level — becoming the youngest race winner in Formula 2 history at 17 years and 254 days. He won the 2024 Formula Regional Oceania championship and impressed in F3 with four wins including a historic sprint-and-feature double at Silverstone. His promotion straight from F2 to F1 reflects Red Bull's supreme confidence in his ability.",
     career: { debutYear: 2026, seasonsInF1: 0, raceEntries: 0, wins: 0, podiums: 0, poles: 0, fastestLaps: 0, championships: 0, bestFinish: "Rookie", previousTeams: [], juniorFormula: "2024 FR Oceania champion, F2 youngest winner" },
   },
@@ -168,6 +179,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 21, australiaResult: 9,
     dateOfBirth: "14 October 2004", placeOfBirth: "São Paulo, Brazil",
     photo: driverPhoto("audi", "gabbor01"),
+    headshot: driverHeadshot("audi", "gabbor01"),
     bio: "The 2024 F2 champion scored two points in Australia, a promising start for the new Audi works team. Bortoleto became only the fourth driver to win consecutive F3 and F2 titles (after Leclerc, Russell, and Piastri), establishing himself as one of the brightest talents in motorsport. Part of Fernando Alonso's management stable, he debuted in F1 with Kick Sauber in 2025 and continues with the same team under its new Audi identity. He is the first Brazilian to compete full-time in F1 since Felipe Massa in 2017.",
     career: { debutYear: 2025, seasonsInF1: 1, raceEntries: 24, wins: 0, podiums: 0, poles: 0, fastestLaps: 0, championships: 0, bestFinish: "19th (2025)", previousTeams: ["Kick Sauber"], juniorFormula: "2023 F3 champion, 2024 F2 champion" },
   },
@@ -177,6 +189,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 30, australiaResult: 10,
     dateOfBirth: "7 February 1996", placeOfBirth: "Rouen, France",
     photo: driverPhoto("alpine", "piegas01"),
+    headshot: driverHeadshot("alpine", "piegas01"),
     bio: "Gasly claimed the final championship point in Australia, a solid result for Alpine in their first season with Mercedes power. His career has been defined by resilience — after being promoted to Red Bull Racing in 2019, he was demoted back to Toro Rosso mid-season, only to deliver one of the most emotional victories in F1 history at the 2020 Italian Grand Prix at Monza, the first win for a French driver in 24 years. He has been Alpine's team leader since 2023 and is contracted through 2028.",
     career: { debutYear: 2017, seasonsInF1: 9, raceEntries: 177, wins: 1, podiums: 5, poles: 0, fastestLaps: 3, championships: 0, bestFinish: "7th (2019)", previousTeams: ["Toro Rosso", "Red Bull Racing", "AlphaTauri", "Alpine"], juniorFormula: "2016 GP2 runner-up" },
   },
@@ -186,6 +199,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 29, australiaResult: 11,
     dateOfBirth: "17 September 1996", placeOfBirth: "Évreux, France",
     photo: driverPhoto("haas", "estoco01"),
+    headshot: driverHeadshot("haas", "estoco01"),
     bio: "Ocon finished just outside the points in Australia in his first race for Haas. A former Mercedes junior driver and 2015 GP3 champion, he won his sole Grand Prix at the chaotic 2021 Hungarian Grand Prix for Alpine. His career has been marked by determination — he sat out the entire 2019 season as a reserve driver before returning to the grid with Renault. Having raced for Manor, Force India, Renault, and Alpine, he brings valuable experience to the growing Haas team.",
     career: { debutYear: 2016, seasonsInF1: 8, raceEntries: 180, wins: 1, podiums: 4, poles: 0, fastestLaps: 1, championships: 0, bestFinish: "8th (2017, 2021)", previousTeams: ["Manor", "Force India", "Renault", "Alpine", "Haas"], juniorFormula: "2015 GP3 champion, 2014 European F3 champion" },
   },
@@ -195,6 +209,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 29, australiaResult: 12,
     dateOfBirth: "23 March 1996", placeOfBirth: "London, England",
     photo: driverPhoto("williams", "alealb01"),
+    headshot: driverHeadshot("williams", "alealb01"),
     bio: "Albon finished 12th in Australia as Williams continues to develop the FW48. Born in London to a Thai mother and British father, he races under the Thai flag and burst onto the F1 scene with Toro Rosso in 2019, earning a mid-season promotion to Red Bull Racing where he secured two podiums. After being dropped from the Red Bull race seat after 2020, he spent a year as their test driver before rebuilding his career at Williams from 2022 onwards. He has established himself as a consistent and well-respected midfield performer.",
     career: { debutYear: 2019, seasonsInF1: 6, raceEntries: 129, wins: 0, podiums: 2, poles: 0, fastestLaps: 1, championships: 0, bestFinish: "8th (2019, 2025)", previousTeams: ["Toro Rosso", "Red Bull Racing", "Williams"], juniorFormula: "2016 GP3 runner-up" },
   },
@@ -204,6 +219,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 24, australiaResult: 13,
     dateOfBirth: "11 February 2002", placeOfBirth: "Hastings, New Zealand",
     photo: driverPhoto("racingbulls", "lialaw01"),
+    headshot: driverHeadshot("racingbulls", "lialaw01"),
     bio: "Lawson finished 13th in Australia alongside his rookie teammate Lindblad. His path to a full-time F1 seat was unconventional — he first deputised for the injured Ricciardo at AlphaTauri in 2023, scoring points in Singapore, then returned as a mid-season substitute at Racing Bulls in 2024. His performances earned him a brief promotion to Red Bull Racing alongside Verstappen for the start of 2025, but after two difficult races he was moved back to Racing Bulls where he found more consistent form with a best finish of 5th in Baku.",
     career: { debutYear: 2023, seasonsInF1: 3, raceEntries: 36, wins: 0, podiums: 0, poles: 0, fastestLaps: 0, championships: 0, bestFinish: "14th (2025)", previousTeams: ["AlphaTauri (sub)", "Racing Bulls", "Red Bull Racing"], juniorFormula: "2019 Toyota Racing Series champion" },
   },
@@ -213,6 +229,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 22, australiaResult: 14,
     dateOfBirth: "27 May 2003", placeOfBirth: "Buenos Aires, Argentina",
     photo: driverPhoto("alpine", "fracol01"),
+    headshot: driverHeadshot("alpine", "fracol01"),
     bio: "Colapinto finished 14th in Australia in his first full season with Alpine. He became the first Argentine F1 driver in 23 years when he replaced Logan Sargeant at Williams from the 2024 Italian Grand Prix onwards, scoring 5 points across 9 races with a best finish of 8th in Azerbaijan. His impressive performances attracted interest from several teams, and he joined Alpine initially as a reserve driver for 2025 before being promoted mid-season. Still only 22, he represents a new generation of Argentine motorsport talent.",
     career: { debutYear: 2024, seasonsInF1: 2, raceEntries: 28, wins: 0, podiums: 0, poles: 0, fastestLaps: 0, championships: 0, bestFinish: "19th (2024)", previousTeams: ["Williams", "Alpine"], juniorFormula: "2023 F2 8th overall" },
   },
@@ -222,6 +239,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 31, australiaResult: 15,
     dateOfBirth: "1 September 1994", placeOfBirth: "Madrid, Spain",
     photo: driverPhoto("williams", "carsai01"),
+    headshot: driverHeadshot("williams", "carsai01"),
     bio: "Son of rally legend Carlos Sainz Sr., Sainz finished 15th in Australia but is expected to elevate Williams as the season develops. A four-time Grand Prix winner, he scored a remarkable comeback victory in Australia 2024 just weeks after emergency appendix surgery. After four successful seasons at Ferrari where he accumulated 25 podiums, he joined Williams for 2025 and immediately elevated the team with podium finishes in Azerbaijan and Qatar. His experience across five teams makes him one of the most well-rounded drivers on the grid.",
     career: { debutYear: 2015, seasonsInF1: 11, raceEntries: 231, wins: 4, podiums: 29, poles: 6, fastestLaps: 4, championships: 0, bestFinish: "4th (2024)", previousTeams: ["Toro Rosso", "Renault", "McLaren", "Ferrari", "Williams"], juniorFormula: "2014 Formula Renault 3.5 champion" },
   },
@@ -231,6 +249,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 36, australiaResult: "Ret",
     dateOfBirth: "26 January 1990", placeOfBirth: "Guadalajara, Mexico",
     photo: driverPhoto("cadillac", "serper01"),
+    headshot: driverHeadshot("cadillac", "serper01"),
     bio: "The most successful Mexican driver in F1 history retired from the Australian Grand Prix but brings invaluable experience to the new Cadillac team. Known as 'the Minister of Defense' for his tire management and wheel-to-wheel racecraft, Pérez has won six Grands Prix and finished championship runner-up in 2023. After four seasons at Red Bull Racing supporting Verstappen's title campaigns, he took a sabbatical in 2025 before signing with the new American constructor for their inaugural season.",
     career: { debutYear: 2011, seasonsInF1: 14, raceEntries: 282, wins: 6, podiums: 39, poles: 3, fastestLaps: 12, championships: 0, bestFinish: "2nd (2023)", previousTeams: ["Sauber", "McLaren", "Force India", "Racing Point", "Red Bull Racing"], juniorFormula: "2010 GP2 runner-up" },
   },
@@ -240,6 +259,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 21, australiaResult: "Ret",
     dateOfBirth: "28 September 2004", placeOfBirth: "Paris, France",
     photo: driverPhoto("redbullracing", "isahad01"),
+    headshot: driverHeadshot("redbullracing", "isahad01"),
     bio: "Hadjar qualified third on his Red Bull Racing debut but retired from the race due to a mechanical issue. Of French-Algerian heritage, he joined the Red Bull Junior Team in 2022 and finished runner-up in the 2024 Formula 2 Championship with four wins. He made his F1 debut with Racing Bulls in 2025, scoring a maiden podium at the Dutch Grand Prix to become the youngest Frenchman on an F1 rostrum. His performances earned him a promotion to the main Red Bull team alongside Verstappen for 2026.",
     career: { debutYear: 2025, seasonsInF1: 1, raceEntries: 24, wins: 0, podiums: 1, poles: 0, fastestLaps: 0, championships: 0, bestFinish: "12th (2025)", previousTeams: ["Racing Bulls"], juniorFormula: "2024 F2 runner-up" },
   },
@@ -249,6 +269,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 24, australiaResult: "DNS",
     dateOfBirth: "6 April 2001", placeOfBirth: "Melbourne, Australia",
     photo: driverPhoto("mclaren", "oscpia01"),
+    headshot: driverHeadshot("mclaren", "oscpia01"),
     bio: "Piastri suffered a heartbreaking crash while driving to the grid at his home race, resulting in a DNS. He arrived in F1 with one of the most decorated junior careers in history — consecutive champion in Formula Renault Eurocup, Formula 3, and Formula 2. After a contractual dispute between Alpine and McLaren was resolved in McLaren's favor, he debuted in 2023 and quickly established himself as a star, taking nine victories in just three seasons. His seven wins and 16 podiums in 2025 saw him finish 3rd in the championship.",
     career: { debutYear: 2023, seasonsInF1: 3, raceEntries: 71, wins: 9, podiums: 26, poles: 6, fastestLaps: 9, championships: 0, bestFinish: "3rd (2025)", previousTeams: ["McLaren"], juniorFormula: "2020 F. Renault champion, 2021 F3 champion, 2022 F2 champion" },
   },
@@ -258,6 +279,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 38, australiaResult: "DNS",
     dateOfBirth: "19 August 1987", placeOfBirth: "Emmerich am Rhein, Germany",
     photo: driverPhoto("audi", "nichul01"),
+    headshot: driverHeadshot("audi", "nichul01"),
     bio: "Hülkenberg did not start in Australia due to a technical issue on the Audi. He announced himself with a stunning pole position at the 2010 Brazilian Grand Prix as a Williams rookie and has been one of the most respected midfield drivers across eight different teams over 15 seasons. He held the record for most race starts without a podium for over a decade before finally breaking through with 3rd place at the rain-affected 2025 British Grand Prix on his 239th start. His vast experience makes him invaluable as the Audi works team builds for the future.",
     career: { debutYear: 2010, seasonsInF1: 13, raceEntries: 252, wins: 0, podiums: 1, poles: 1, fastestLaps: 2, championships: 0, bestFinish: "7th (2018)", previousTeams: ["Williams", "Force India", "Sauber", "Renault", "Haas", "Kick Sauber"], juniorFormula: "2009 GP2 champion" },
   },
@@ -267,6 +289,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 44, australiaResult: "Ret",
     dateOfBirth: "29 July 1981", placeOfBirth: "Oviedo, Spain",
     photo: driverPhoto("astonmartin", "feralo01"),
+    headshot: driverHeadshot("astonmartin", "feralo01"),
     bio: "One of the greatest drivers in F1 history, Alonso retired in Australia as Aston Martin adapts to its new Honda power unit. He became the youngest World Champion at the time when he won back-to-back titles with Renault in 2005 and 2006, ending Michael Schumacher's five-year dominance. He narrowly missed further titles at Ferrari, finishing runner-up in 2010, 2012, and 2013. In 2024, he became the first driver to reach 400 Grand Prix starts. Now 44 with 32 wins and 106 podiums across 25 seasons, his longevity and competitiveness remain unmatched.",
     career: { debutYear: 2001, seasonsInF1: 23, raceEntries: 428, wins: 32, podiums: 106, poles: 22, fastestLaps: 26, championships: 2, championshipYears: "2005, 2006", previousTeams: ["Minardi", "Renault", "McLaren", "Ferrari", "Alpine"], juniorFormula: "2000 Formula 3000 runner-up" },
   },
@@ -276,6 +299,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 36, australiaResult: "Ret",
     dateOfBirth: "28 August 1989", placeOfBirth: "Nastola, Finland",
     photo: driverPhoto("cadillac", "valbot01"),
+    headshot: driverHeadshot("cadillac", "valbot01"),
     bio: "Bottas retired in Australia in the Cadillac team's inaugural race. He holds the record for the most career points (1,797) without winning a World Championship, having finished runner-up twice during five seasons as Lewis Hamilton's teammate at Mercedes (2017-2021), where he won 10 races and helped the team to five consecutive constructors' titles. After three seasons at Alfa Romeo/Kick Sauber and a year as Mercedes reserve in 2025, he brings a wealth of front-running experience to the new American constructor.",
     career: { debutYear: 2013, seasonsInF1: 12, raceEntries: 247, wins: 10, podiums: 67, poles: 20, fastestLaps: 19, championships: 0, bestFinish: "2nd (2019, 2020)", previousTeams: ["Williams", "Mercedes", "Alfa Romeo/Kick Sauber"], juniorFormula: "2011 GP3 champion" },
   },
@@ -285,6 +309,7 @@ export const DRIVERS_2026: Driver[] = [
     age: 27, australiaResult: "NC",
     dateOfBirth: "29 October 1998", placeOfBirth: "Montreal, Canada",
     photo: driverPhoto("astonmartin", "lanstr01"),
+    headshot: driverHeadshot("astonmartin", "lanstr01"),
     bio: "Stroll was not classified in Australia after failing to complete 90% of the race distance. He became one of the youngest drivers to score a podium when he finished 3rd in Baku during his 2017 rookie season with Williams at just 18. His father Lawrence Stroll's investment led to the team becoming Racing Point and then Aston Martin, where Lance has been a fixture since 2019. He claimed his sole pole position in wet conditions at the 2020 Turkish Grand Prix. Now in his tenth F1 season, he continues to develop alongside the experienced Alonso.",
     career: { debutYear: 2017, seasonsInF1: 9, raceEntries: 191, wins: 0, podiums: 3, poles: 1, fastestLaps: 0, championships: 0, bestFinish: "10th (2023)", previousTeams: ["Williams", "Racing Point", "Aston Martin"], juniorFormula: "2016 European F3 champion" },
   },
