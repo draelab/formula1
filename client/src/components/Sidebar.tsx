@@ -40,11 +40,13 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       {/* Logo */}
       <div className="px-6 py-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#E8002D] flex items-center justify-center rounded-sm">
-            <span className="text-white font-black text-xs f1-display">F1</span>
+          <div className="w-8 h-8 bg-[#E8002D] flex items-center justify-center rounded-sm p-1">
+            <svg viewBox="0 0 80 40" fill="white" className="w-full h-full">
+              <path d="M0 30.5V3.1h27.6v7.2H10v5h14.8v6.9H10V30.5H0zM27.6 30.5V10.3L37.6 3.1V30.5h-10z" />
+            </svg>
           </div>
           <div>
-            <div className="text-white font-bold text-sm f1-display tracking-wider">FORMULA ONE</div>
+            <div className="text-white font-bold text-sm f1-display tracking-wider">F1 DASH</div>
             <div className="text-white/40 text-xs f1-mono">2026 SEASON</div>
           </div>
         </div>

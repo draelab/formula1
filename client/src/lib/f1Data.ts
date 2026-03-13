@@ -87,6 +87,20 @@ export const TEAM_CAR_IMAGES: Record<string, string> = {
   "Aston Martin": "/cars/aston-martin.webp",
 };
 
+export const TEAM_LOGOS: Record<string, string> = {
+  Mercedes: "/teams/mercedes.webp",
+  Ferrari: "/teams/ferrari.webp",
+  McLaren: "/teams/mclaren.webp",
+  "Red Bull Racing": "/teams/red-bull-racing.webp",
+  Haas: "/teams/haas.webp",
+  "Racing Bulls": "/teams/racing-bulls.webp",
+  Audi: "/teams/audi.webp",
+  Alpine: "/teams/alpine.webp",
+  Williams: "/teams/williams.webp",
+  Cadillac: "/teams/cadillac.webp",
+  "Aston Martin": "/teams/aston-martin.webp",
+};
+
 export const DRIVERS_2026: Driver[] = [
   {
     position: 1, name: "George Russell", shortName: "RUS", nationality: "British", flag: "🇬🇧",

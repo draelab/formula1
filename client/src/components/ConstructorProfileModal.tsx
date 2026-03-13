@@ -2,7 +2,7 @@
 // Full team profile with car, drivers, performance radar, and technical analysis
 
 import { useState, useMemo, useEffect } from "react";
-import { CONSTRUCTORS_2026, CAR_SPECS_2026, DRIVERS_2026, TEAM_COLORS, TEAM_CAR_IMAGES } from "@/lib/f1Data";
+import { CONSTRUCTORS_2026, CAR_SPECS_2026, DRIVERS_2026, TEAM_COLORS, TEAM_CAR_IMAGES, TEAM_LOGOS } from "@/lib/f1Data";
 import { useRaceResults } from "@/hooks/useF1LiveData";
 import {
   Dialog,
@@ -69,6 +69,7 @@ export default function ConstructorProfileModal({
   const teamDrivers = teamName ? DRIVERS_2026.filter((d) => d.team === teamName) : [];
   const teamColor = teamName ? TEAM_COLORS[teamName] || "#888" : "#888";
   const carImage = teamName ? TEAM_CAR_IMAGES[teamName] : undefined;
+  const teamLogo = teamName ? TEAM_LOGOS[teamName] : undefined;
 
   const latestRaceResult = useMemo(() => {
     if (!teamName || races.length === 0) return null;
@@ -101,9 +102,9 @@ export default function ConstructorProfileModal({
             ✕
           </button>
 
-          {/* Car image */}
-          <div className="flex items-center justify-center p-6 pb-2">
-            <div className="h-48 md:h-64 max-w-2xl w-full flex items-center justify-center">
+          {/* Car image — large and centered */}
+          <div className="flex items-center justify-center px-6 pt-6 pb-10">
+            <div className="h-56 md:h-72 w-full flex items-center justify-center">
               {carImage && (
                 <img
                   src={carImage}
@@ -117,15 +118,29 @@ export default function ConstructorProfileModal({
             </div>
           </div>
 
-          {/* Team name & chassis info */}
-          <div className="text-white text-center pb-6 px-6">
-            <h2 className="f1-display text-3xl md:text-4xl font-black uppercase leading-none mb-2">
+          {/* Team name overlay — bottom left */}
+          <div className="absolute bottom-0 left-0 p-4">
+            <h2 className="f1-display text-2xl md:text-3xl font-black uppercase leading-none text-white drop-shadow-lg">
               {teamName}
             </h2>
-            <div className="text-white/70 text-sm f1-mono">
+            <div className="text-white/70 text-xs f1-mono mt-1 drop-shadow">
               {constructorData?.chassis} · {constructorData?.powerUnit}
             </div>
           </div>
+
+          {/* Team logo overlay — bottom right */}
+          {teamLogo && (
+            <div className="absolute bottom-3 right-4">
+              <img
+                src={teamLogo}
+                alt={`${teamName} logo`}
+                className="h-10 md:h-12 object-contain opacity-90"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Body */}
@@ -180,14 +195,13 @@ export default function ConstructorProfileModal({
                       >
                         {driver.number}
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-[#1A1A2E]">{driver.name}</div>
                         <div className="text-xs text-gray-400 f1-mono">
-                          {driver.nationality} {driver.flag}
+                          {driver.nationality} {driver.flag} · {driver.points} pts
                         </div>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 f1-mono mt-1">{driver.points} pts</div>
                   </div>
                 ))}
               </div>
@@ -210,60 +224,63 @@ export default function ConstructorProfileModal({
             ))}
           </div>
 
-          {/* Latest Race Result */}
-          {(racesLoading || latestRaceResult || constructorData?.australiaResult) && (
-            <div className="bg-[#1A1A2E] rounded-sm p-4">
-              {racesLoading ? (
-                <div className="text-white/40 text-xs f1-mono uppercase tracking-widest">Loading latest result...</div>
-              ) : latestRaceResult ? (
-                <>
-                  <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
-                    Latest Race — {latestRaceResult.race.name}
-                  </div>
-                  <div className="space-y-2">
-                    {latestRaceResult.teamResults.map((r: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white font-black f1-stat-number text-sm">P{r.position}</span>
-                          <span className="text-white text-sm">{r.driver}</span>
-                        </div>
-                        <span className="text-white/60 text-xs f1-mono">{r.points} pts</span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : constructorData?.australiaResult ? (
-                <>
-                  <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
-                    Australian GP Result
-                  </div>
-                  <div className="text-white font-bold f1-mono text-sm">{constructorData.australiaResult}</div>
-                </>
-              ) : null}
+          {/* Performance & Latest Result */}
+          <div className={`grid gap-4 ${(racesLoading || latestRaceResult || constructorData?.australiaResult) ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
+            {/* Performance Radar */}
+            <div className="bg-white border border-gray-100 rounded-sm p-4 shadow-sm">
+              <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Performance Indices</div>
+              <ResponsiveContainer width="100%" height={240}>
+                <RadarChart data={getRadarData(teamName)}>
+                  <PolarGrid stroke="#e5e7eb" />
+                  <PolarAngleAxis
+                    dataKey="subject"
+                    tick={{ fontSize: 10, fontFamily: "IBM Plex Mono", fill: "#888" }}
+                  />
+                  <Radar
+                    name={teamName}
+                    dataKey="A"
+                    stroke={teamColor}
+                    fill={teamColor}
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+              <div className="text-xs text-gray-400 f1-mono text-center mt-1">Estimated performance indices</div>
             </div>
-          )}
 
-          {/* Performance Radar */}
-          <div className="bg-white border border-gray-100 rounded-sm p-4 shadow-sm">
-            <div className="text-xs text-gray-400 f1-mono uppercase tracking-widest mb-2">Performance Indices</div>
-            <ResponsiveContainer width="100%" height={240}>
-              <RadarChart data={getRadarData(teamName)}>
-                <PolarGrid stroke="#e5e7eb" />
-                <PolarAngleAxis
-                  dataKey="subject"
-                  tick={{ fontSize: 10, fontFamily: "IBM Plex Mono", fill: "#888" }}
-                />
-                <Radar
-                  name={teamName}
-                  dataKey="A"
-                  stroke={teamColor}
-                  fill={teamColor}
-                  fillOpacity={0.2}
-                  strokeWidth={2}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
-            <div className="text-xs text-gray-400 f1-mono text-center mt-1">Estimated performance indices</div>
+            {/* Latest Race Result */}
+            {(racesLoading || latestRaceResult || constructorData?.australiaResult) && (
+              <div className="bg-[#1A1A2E] rounded-sm p-4">
+                {racesLoading ? (
+                  <div className="text-white/40 text-xs f1-mono uppercase tracking-widest">Loading latest result...</div>
+                ) : latestRaceResult ? (
+                  <>
+                    <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
+                      Latest Race — {latestRaceResult.race.name}
+                    </div>
+                    <div className="space-y-2">
+                      {latestRaceResult.teamResults.map((r: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white font-black f1-stat-number text-sm">P{r.position}</span>
+                            <span className="text-white text-sm">{r.driver}</span>
+                          </div>
+                          <span className="text-white/60 text-xs f1-mono">{r.points} pts</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : constructorData?.australiaResult ? (
+                  <>
+                    <div className="text-white/40 text-[10px] f1-mono uppercase tracking-widest mb-2">
+                      Australian GP Result
+                    </div>
+                    <div className="text-white font-bold f1-mono text-sm">{constructorData.australiaResult}</div>
+                  </>
+                ) : null}
+              </div>
+            )}
           </div>
 
           {/* Collapsible Technical Analysis */}

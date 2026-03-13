@@ -32,9 +32,9 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
     ? liveSchedule.find((r: any) => new Date(r.date) >= today)
     : RACES_2026.find(r => r.status === "next");
 
-  // Top 10 results from last race
-  const raceTop10 = lastRace && (lastRace as any).results
-    ? (lastRace as any).results.slice(0, 10)
+  // Top 8 results from last race
+  const raceTop8 = lastRace && (lastRace as any).results
+    ? (lastRace as any).results.slice(0, 8)
     : [
         { givenName: "George", familyName: "Russell", team: "Mercedes", points: 25 },
         { givenName: "Kimi", familyName: "Antonelli", team: "Mercedes", points: 18 },
@@ -44,8 +44,6 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
         { givenName: "Max", familyName: "Verstappen", team: "Red Bull Racing", points: 8 },
         { givenName: "Oliver", familyName: "Bearman", team: "Haas", points: 6 },
         { givenName: "Liam", familyName: "Lawson", team: "Racing Bulls", points: 4 },
-        { givenName: "Gabriel", familyName: "Bortoleto", team: "Audi", points: 2 },
-        { givenName: "Pierre", familyName: "Gasly", team: "Alpine", points: 1 },
       ];
 
   const maxPoints = Math.max(...top5Drivers.map((d: any) => Number(d.points) || 0));
@@ -154,9 +152,9 @@ export default function OverviewSection({ onSectionChange }: OverviewSectionProp
 
           {/* Top 5 Results */}
           <div className="space-y-0">
-            {raceTop10.map((result: any, idx: number) => {
+            {raceTop8.map((result: any, idx: number) => {
               const teamColor = TEAM_COLORS[result.team] || "#666";
-              const posColors = ["bg-[#E8002D] text-white", "bg-[#1A1A2E] text-white", "bg-[#1A1A2E] text-white", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent"];
+              const posColors = ["bg-[#E8002D] text-white", "bg-[#1A1A2E] text-white", "bg-[#1A1A2E] text-white", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent", "text-[#1A1A2E] bg-transparent"];
               return (
                 <div key={idx} className="flex items-center py-3 border-b border-gray-100 last:border-b-0">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-4 ${posColors[idx]}`}
