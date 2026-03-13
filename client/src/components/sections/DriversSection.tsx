@@ -18,6 +18,7 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
   const [selectedDriver, setSelectedDriver] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [view, setView] = useState<"table" | "chart">("table");
+  const [failedHeadshots, setFailedHeadshots] = useState<Set<string>>(new Set());
   const { standings, round, isLive, isLoading, updatedAt } = useDriverStandings();
 
   const maxPoints = Math.max(...standings.map((d: any) => d.points), 1);
@@ -122,16 +123,18 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
                       className="w-10 h-10 rounded-full overflow-hidden border-2 bg-gray-100 flex-shrink-0"
                       style={{ borderColor: teamColor }}
                     >
-                      <img
-                        src={driver.headshot || driver.photo}
-                        alt={driver.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const el = e.target as HTMLImageElement;
-                          el.style.display = "none";
-                          el.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs font-bold text-gray-400 f1-mono">${driver.shortName}</div>`;
-                        }}
-                      />
+                      {failedHeadshots.has(driver.shortName) ? (
+                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-400 f1-mono">
+                          {driver.shortName}
+                        </div>
+                      ) : (
+                        <img
+                          src={driver.headshot || driver.photo}
+                          alt={driver.name}
+                          className="w-full h-full object-cover"
+                          onError={() => setFailedHeadshots((prev) => new Set(prev).add(driver.shortName))}
+                        />
+                      )}
                     </div>
                   </div>
 
