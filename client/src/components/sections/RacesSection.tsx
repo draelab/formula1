@@ -2,15 +2,18 @@
 // Design: Timeline layout with completed/upcoming status indicators
 
 import { useState } from "react";
-import { RACES_2026 } from "@/lib/f1Data";
-import { CheckCircle, Clock, Zap, MapPin, Timer, ChevronDown, ChevronUp } from "lucide-react";
+import { Race, RACES_2026 } from "@/lib/f1Data";
+import { CheckCircle, Clock, Zap, MapPin, Timer, ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import CircuitProfileModal from "@/components/CircuitProfileModal";
 
 const CIRCUIT_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310419663031769921/QfooNsf5N2WhwQZYmGVtwY/f1-circuit-abstract-3WGaeLDJCs6BJEEFCT6Lq9.webp";
 
 export default function RacesSection() {
   const [expanded, setExpanded] = useState<number | null>(2); // Default open next race
   const [filter, setFilter] = useState<"all" | "completed" | "upcoming">("all");
+  const [selectedRace, setSelectedRace] = useState<Race | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const filtered = RACES_2026.filter(r => {
     if (filter === "completed") return r.status === "completed";
@@ -161,7 +164,7 @@ export default function RacesSection() {
                         ))}
                       </div>
 
-                      {race.lapRecord && race.lapRecord !== "N/A (new circuit)" && (
+                      {race.lapRecord && (
                         <div className="mt-2 bg-white rounded-sm p-2 border border-gray-100 flex items-center gap-2">
                           <Timer size={12} className="text-[#E8002D] shrink-0" />
                           <div>
@@ -222,12 +225,32 @@ export default function RacesSection() {
                       )}
                     </div>
                   </div>
+
+                  {/* View Details button */}
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRace(race);
+                        setModalOpen(true);
+                      }}
+                      className="text-xs f1-mono font-medium text-[#E8002D] flex items-center gap-1 hover:gap-2 transition-all cursor-pointer"
+                    >
+                      View Circuit Profile <ChevronRight size={12} />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           );
         })}
       </div>
+
+      <CircuitProfileModal
+        race={selectedRace}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </div>
   );
 }
