@@ -1,4 +1,4 @@
-// F1 2026 Dashboard — Driver Standings Section (Live Data)
+// F1 2026 Dashboard — Drivers Section (Live Data)
 // Design: Editorial table with team colour accents, performance bars
 
 import { useState } from "react";
@@ -58,7 +58,7 @@ export default function DriversSection({ onNavigateToTeam, onNavigateToCar }: Dr
             <div className="w-1 h-8 bg-[#E8002D]" />
             <div>
               <div className="text-[#E8002D] text-xs f1-mono uppercase tracking-widest">2026 Season</div>
-              <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Driver Standings</h2>
+              <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Drivers</h2>
             </div>
           </div>
           <div className="flex items-center gap-3 ml-4 mt-1">

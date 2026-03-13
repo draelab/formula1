@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Trophy, Timer, MapPin, Calendar, Mountain, Ruler, CornerDownRight, Flag, Zap } from "lucide-react";
+import { Trophy, Timer, MapPin, Mountain, Ruler, CornerDownRight, Flag, Zap } from "lucide-react";
 
 interface CircuitProfileModalProps {
   race: Race | null;
@@ -27,7 +27,7 @@ export default function CircuitProfileModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-4xl max-h-[85vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
+        className="sm:max-w-5xl max-h-[85vh] overflow-y-auto p-0 gap-0 bg-[#F8F7F4] border-0"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{race?.name ?? "Circuit"} — Circuit Profile</DialogTitle>
@@ -44,14 +44,14 @@ export default function CircuitProfileModal({
             ✕
           </button>
 
-          <div className="flex items-end gap-6 p-6">
-            {/* Track layout image */}
+          <div className="flex flex-col items-center p-6 pb-5">
+            {/* Track layout image — primary focus */}
             {race.trackImage && (
-              <div className="w-48 h-36 md:w-64 md:h-44 flex-shrink-0 flex items-center justify-center">
+              <div className="w-full max-w-lg flex items-center justify-center mb-5">
                 <img
                   src={race.trackImage}
                   alt={`${race.circuit} layout`}
-                  className="w-full h-full object-contain opacity-90"
+                  className="w-full h-auto object-contain opacity-90"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
@@ -59,16 +59,16 @@ export default function CircuitProfileModal({
               </div>
             )}
 
-            {/* Race info */}
-            <div className="flex-1 pb-2 text-white">
-              <div className="text-white/50 text-xs f1-mono uppercase tracking-widest mb-1">
-                Round {race.round} · {race.date}
-              </div>
+            {/* Race info — below track image */}
+            <div className="text-white text-center w-full">
               <h2 className="f1-display text-3xl md:text-4xl font-black uppercase leading-none mb-2">
                 {race.name}
               </h2>
               <div className="text-white/70 text-sm f1-mono mb-2">{race.circuit}</div>
-              <div className="flex items-center gap-4 text-sm text-white/80 flex-wrap">
+              <div className="flex items-center justify-center gap-4 text-sm text-white/80 flex-wrap">
+                <span className="text-white/50 text-xs f1-mono uppercase tracking-widest">
+                  Round {race.round} · {race.date}
+                </span>
                 <span className="flex items-center gap-1">
                   <span className="text-lg">{race.flag}</span>
                   {race.location}, {race.country}
@@ -101,11 +101,6 @@ export default function CircuitProfileModal({
               {race.altitude !== undefined && (
                 <span className="flex items-center gap-1">
                   <Mountain size={12} /> {race.altitude}m altitude
-                </span>
-              )}
-              {race.firstGrandPrix && (
-                <span className="flex items-center gap-1">
-                  <Calendar size={12} /> First GP: {race.firstGrandPrix}
                 </span>
               )}
               {race.numberOfGrandsPrix !== undefined && race.numberOfGrandsPrix > 0 && (
@@ -194,12 +189,6 @@ export default function CircuitProfileModal({
                     <div className="bg-[#1A1A2E] rounded-sm p-3">
                       <div className="text-white/40 text-[10px] f1-mono uppercase">Year Built</div>
                       <div className="text-white font-black f1-stat-number text-lg">{race.yearBuilt}</div>
-                    </div>
-                  )}
-                  {race.firstGrandPrix && (
-                    <div className="bg-[#1A1A2E] rounded-sm p-3">
-                      <div className="text-white/40 text-[10px] f1-mono uppercase">First Grand Prix</div>
-                      <div className="text-white font-black f1-stat-number text-lg">{race.firstGrandPrix}</div>
                     </div>
                   )}
                   {race.numberOfGrandsPrix !== undefined && (

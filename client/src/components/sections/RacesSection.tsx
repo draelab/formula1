@@ -1,9 +1,9 @@
-// F1 2026 Dashboard — Race Calendar Section
+// F1 2026 Dashboard — Races Section
 // Design: Timeline layout with completed/upcoming status indicators
 
 import { useState } from "react";
 import { Race, RACES_2026 } from "@/lib/f1Data";
-import { CheckCircle, Clock, Zap, MapPin, Timer, ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
+import { CheckCircle, Clock, Zap, MapPin, Timer, ChevronDown, ChevronUp, ChevronRight, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CircuitProfileModal from "@/components/CircuitProfileModal";
 
@@ -30,7 +30,7 @@ export default function RacesSection() {
             <div className="w-1 h-8 bg-[#E8002D]" />
             <div>
               <div className="text-[#E8002D] text-xs f1-mono uppercase tracking-widest">2026 Season</div>
-              <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Race Calendar</h2>
+              <h2 className="f1-display text-3xl font-black text-[#1A1A2E] uppercase tracking-wide">Races</h2>
             </div>
           </div>
           <p className="text-gray-500 text-sm ml-4 mt-1">24 Grands Prix across 5 continents</p>
@@ -136,6 +136,19 @@ export default function RacesSection() {
                     <div className="text-xs text-green-600 font-medium">🏆 {race.winner}</div>
                   )}
                 </div>
+
+                {/* Circuit Profile */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedRace(race);
+                    setModalOpen(true);
+                  }}
+                  className="shrink-0 p-1 rounded-sm text-gray-300 hover:text-[#E8002D] transition-colors cursor-pointer"
+                  title="View circuit details"
+                >
+                  <Info size={15} />
+                </button>
 
                 {/* Expand */}
                 <div className="shrink-0 ml-2">

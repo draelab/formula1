@@ -24,9 +24,9 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "drivers", label: "Driver Standings", icon: Users },
+  { id: "drivers", label: "Drivers", icon: Users },
   { id: "constructors", label: "Constructors", icon: Building2 },
-  { id: "races", label: "Race Calendar", icon: MapPin },
+  { id: "races", label: "Races", icon: MapPin },
   { id: "predictions", label: "Predictions", icon: TrendingUp },
   { id: "cars", label: "Car Breakdown", icon: Car },
 ];
