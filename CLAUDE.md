@@ -52,6 +52,23 @@ Full-stack TypeScript monorepo using **Vite + React 19** (client) and **Express*
 
 Single `users` table (Drizzle + MySQL) with OAuth fields (`openId`, `loginMethod`, `role`). Schema in `drizzle/schema.ts`.
 
+## Deployment (Railway)
+
+Deployed on Railway as project `f1dash` (production environment). Auto-deploys from GitHub on push to `main`.
+
+```bash
+git push origin main   # Deploy via GitHub (preferred — railway up hangs in non-interactive shells)
+railway logs           # Check deployment logs
+railway service status --all --json  # Check build/deploy status
+```
+
+**Stale token fix:** Railway session tokens expire and block `railway login` with "Invalid RAILWAY_API_TOKEN". Fix with:
+```bash
+unset RAILWAY_API_TOKEN && railway login
+railway link   # re-link to f1dash / production (link is lost after re-auth)
+```
+Note: `railway logout` alone won't fix it — the env var must be explicitly unset.
+
 ## Design System
 
 - **Typography:** Barlow Condensed (display), IBM Plex Sans (body), IBM Plex Mono (stats/lap times)

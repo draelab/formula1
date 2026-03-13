@@ -171,16 +171,26 @@ export default function CurrentRaceSection() {
     return tabs;
   }, [practice, isSprint]);
 
-  // Default to most interesting tab
+  // Default to last completed session (reverse chronological order)
   const [activeTab, setActiveTab] = useState<SessionTab | null>(null);
   const effectiveTab = useMemo(() => {
     if (activeTab && availableTabs.includes(activeTab)) return activeTab;
-    // Auto-select: race > sprint > qualifying > latest practice
+    // Auto-select: last completed session in weekend order
     if (raceResult?.results?.length) return "Race";
     if (sprint?.results?.length) return "Sprint";
     if (qualifying?.results?.length) return "Qualifying";
-    return availableTabs[availableTabs.length - 1] ?? "Race";
-  }, [activeTab, availableTabs, raceResult, sprint, qualifying]);
+    // Check practice sessions in reverse (FP3 > FP2 > FP1)
+    const fpTabs = availableTabs.filter(t => t.startsWith("FP"));
+    for (let i = fpTabs.length - 1; i >= 0; i--) {
+      const fpNum = fpTabs[i].replace("FP", "");
+      const hasData = practice?.sessions?.some(
+        (s: any) => s.sessionName === `Practice ${fpNum}` && s.results?.length > 0
+      );
+      if (hasData) return fpTabs[i];
+    }
+    // No session has data — show first tab instead of Race
+    return availableTabs[0] ?? "Race";
+  }, [activeTab, availableTabs, raceResult, sprint, qualifying, practice]);
 
   const isLoading = scheduleLoading || resultsLoading;
 

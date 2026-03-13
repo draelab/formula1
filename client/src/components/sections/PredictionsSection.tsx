@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { RACES_2026, DRIVERS_2026 } from "@/lib/f1Data";
 import { useDriverStandings, useConstructorStandings, useRaceResults } from "@/hooks/useF1LiveData";
 import { TrendingUp, Target, Zap, Trophy, AlertTriangle, Loader2 } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from "recharts";
 
 // ─── Constructor ID → team color mapping ────────────────────────────────────
 const CONSTRUCTOR_ID_TO_COLOR: Record<string, string> = {
@@ -85,14 +85,14 @@ export default function PredictionsSection() {
     });
   }, [driverStandings, completedRaceCount]);
 
-  // ─── B. Championship trajectory from race results ───────────────────────────
-  const trajectoryData = useMemo(() => {
-    if (completedRaces.length === 0) return [];
-    const top6Ids = topDrivers.map((d: any) => d.driverId ?? d.shortName);
+  // ─── B. Championship trajectory from race results + projected future ────────
+  const { actualData, projectedData } = useMemo(() => {
+    if (completedRaces.length === 0) return { actualData: [], projectedData: [] };
     const cumulativePoints: Record<string, number> = {};
-    top6Ids.forEach((id: string) => { cumulativePoints[id] = 0; });
+    topDrivers.forEach((d: any) => { cumulativePoints[d.driverId ?? d.shortName] = 0; });
 
-    return completedRaces.map((race: any) => {
+    // Build actual race data
+    const actual = completedRaces.map((race: any) => {
       const roundLabel = race.raceName
         ?.replace(" Grand Prix", "")
         ?.substring(0, 3)
@@ -112,7 +112,43 @@ export default function PredictionsSection() {
 
       return roundData;
     });
+
+    // Build projected data: start from last actual point, extend 5 future rounds
+    const upcomingRaces = RACES_2026.filter(r => r.status === "upcoming" || r.status === "next").slice(0, 5);
+    if (upcomingRaces.length === 0) return { actualData: actual, projectedData: [] };
+
+    // Bridge point: last actual data point (so projected lines connect)
+    const lastActual = actual[actual.length - 1];
+    const projected = [{ ...lastActual }];
+
+    upcomingRaces.forEach((race, idx) => {
+      const roundLabel = race.name
+        ?.replace(" Grand Prix", "")
+        ?.substring(0, 3)
+        ?.toUpperCase() ?? `R${race.round}`;
+
+      const roundData: any = { round: roundLabel };
+
+      topDrivers.forEach((driver: any) => {
+        const displayName = driver.familyName ?? driver.shortName ?? (driver.driverId ?? "");
+        const currentPoints = lastActual?.[displayName] ?? 0;
+        const avgPerRace = driver.avgPointsPerRace ?? 0;
+        roundData[displayName] = Math.round(currentPoints + avgPerRace * (idx + 1));
+      });
+
+      projected.push(roundData);
+    });
+
+    return { actualData: actual, projectedData: projected };
   }, [completedRaces, topDrivers]);
+
+  // Combined data for the chart (actual rounds + projected rounds)
+  const trajectoryData = useMemo(() => {
+    return [...actualData, ...projectedData.slice(1)]; // skip bridge point duplicate
+  }, [actualData, projectedData]);
+
+  // Index where projected data starts (for rendering dashed lines)
+  const projectionStartIndex = actualData.length - 1;
 
   // ─── C. Upcoming race predictions ───────────────────────────────────────────
   const upcomingPredictions = useMemo(() => {
@@ -341,24 +377,37 @@ export default function PredictionsSection() {
       {/* Championship Trajectory Chart */}
       {trajectoryData.length > 0 && (
         <div className="bg-white border border-gray-100 rounded-sm p-5 shadow-sm mb-6">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-1">
             <TrendingUp size={16} className="text-[#E8002D]" />
             <div className="text-sm font-semibold text-[#1A1A2E] f1-display uppercase tracking-wide">
-              Championship Trajectory (Rounds 1{trajectoryData.length > 1 ? `\u2013${trajectoryData.length}` : ""})
+              Championship Trajectory
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={260}>
+          <p className="text-xs text-gray-400 f1-mono mb-4 ml-6">
+            Cumulative points for top 6 drivers — solid lines show actual results{projectedData.length > 1 ? ", dashed lines show projected pace" : ""}
+          </p>
+          <ResponsiveContainer width="100%" height={280}>
             <LineChart data={trajectoryData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="round" tick={{ fontSize: 13, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 13, fontFamily: "IBM Plex Mono", fill: "#888" }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
+              {/* Reference line separating actual from projected */}
+              {projectedData.length > 1 && actualData.length > 0 && (
+                <ReferenceLine
+                  x={actualData[actualData.length - 1]?.round}
+                  stroke="#ccc"
+                  strokeDasharray="4 4"
+                  label={{ value: "Projected →", position: "top", fontSize: 10, fill: "#aaa", fontFamily: "IBM Plex Mono" }}
+                />
+              )}
+              {/* Driver lines (solid for actual, hollow dots for projected) */}
               {(() => {
                 const seenColors = new Set<string>();
                 return topDrivers.map((d: any, idx: number) => {
                   const name = d.familyName ?? d.shortName ?? `Driver ${idx + 1}`;
                   const color = d.color;
-                  const isDashed = seenColors.has(color);
+                  const isTeamDupe = seenColors.has(color);
                   seenColors.add(color);
                   return (
                     <Line
@@ -366,9 +415,18 @@ export default function PredictionsSection() {
                       type="monotone"
                       dataKey={name}
                       stroke={color}
-                      strokeWidth={isDashed ? 1.5 : 2.5}
-                      strokeDasharray={isDashed ? "4 2" : undefined}
-                      dot={{ r: isDashed ? 2 : 3 }}
+                      strokeWidth={isTeamDupe ? 1.5 : 2.5}
+                      strokeDasharray={isTeamDupe ? "4 2" : undefined}
+                      dot={(props: any) => {
+                        const { cx, cy, index } = props;
+                        if (index > projectionStartIndex) {
+                          // Projected points: hollow circle
+                          return <circle key={`dot-${name}-${index}`} cx={cx} cy={cy} r={isTeamDupe ? 2 : 3} fill="white" stroke={color} strokeWidth={1.5} />;
+                        }
+                        // Actual points: solid circle
+                        return <circle key={`dot-${name}-${index}`} cx={cx} cy={cy} r={isTeamDupe ? 2 : 3} fill={color} />;
+                      }}
+                      strokeOpacity={1}
                       name={name}
                     />
                   );
@@ -383,6 +441,12 @@ export default function PredictionsSection() {
                 <span className="text-sm text-gray-500 f1-mono">{name}</span>
               </div>
             ))}
+            {projectedData.length > 1 && (
+              <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-gray-200">
+                <div className="w-2 h-2 rounded-full border border-gray-400 bg-white" />
+                <span className="text-sm text-gray-400 f1-mono">Projected</span>
+              </div>
+            )}
           </div>
         </div>
       )}
